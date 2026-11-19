@@ -1,5 +1,98 @@
 # NOTES (HEATWAVE Cover Studio)
 
+## Status: M5 done (run 6, 19 Nov 2026, 19:42-20:16 EET): crisp shot 1 + a cinematic hero
+Short run on shot 1's ART at judge size (768x432). Key Art Slash, the HEATWAVE title, the dressing and Sky glow are
+unchanged. Shots 2-4 are untouched (M3b files).
+
+### What changed
+- **Step 1: crisp look (gap 2). KEPT: shot 1 has no Poster Ink now.**
+  - Ink is chosen per shot scene (`ink: <0..1>` in app/src/dev/shot-scenes.js; 0 = off, 0.8 when a scene says nothing).
+    `&ink=0|<strength>` overrides it for trial renders, like `&glow=`. Only `cover-keyart` sets `ink: 0`. Shots 2-4
+    keep 0.8, and the editor shot still shows the Poster Ink toggle. Poster Ink is unchanged as an editor feature.
+  - **No-ink lift that keeps shadows** (`liftKeepShadows` in engine/ink.js, used by `panelArt` for every no-ink
+    render, not only shots). The old gamma lift to a mean of 0.44 made the ink-0 trial milky. The new one fades the
+    lift out below about 0.25 and pushes the toe down, so hair and shadows stay deep. Mid-tones and highlights get the
+    same lift as before.
+  - Trials (out/ab/, 1280x720 JPEG of the 1920 export, read next to before.jpg and rival #1 at 768x432):
+
+    | shot 1 trial | std | bright (>215) | dark (<40) | read at 768x432 |
+    |---|---|---|---|---|
+    | before (M4, ink 0.8) | 77 | 0.15 | 0.25 | halftone dots in the hero's hair, soft man and moto panels |
+    | ink 0.8 (re-render) | 77 | 0.15 | 0.25 | byte-size identical to M4's file (207.3 KiB) |
+    | ink 0.35 | 75 | 0.15 | 0.23 | still painterly-soft |
+    | ink 0, old lift | 74 | 0.15 | 0.20 | sharp, but milky and pastel |
+    | **ink 0, new lift (kept)** | 75 | 0.15 | 0.21 | sharp faces, no dots, dark hair and shadows, skies still glow |
+    | rival #1 | 76 | 0.11 | 0.27 | |
+
+    The dark fraction drops with ink off because ink lines and halftone added dark pixels. The new lift keeps the
+    shadows that are in the photo.
+- **Step 2: cinematic hero and readable panels (gaps 1 and 4). KEPT.**
+  - 3 of the operator's 5 photos in briefs' assets_s268 were added to app/samples/ (all .jpg, no text, letters, logos or
+    watermarks, fictional people): **hero-rooftop**, **marina-night** and **neon-closeup**. They are in the sample list
+    (`SAMPLE_PHOTOS`, now 18) and in CREDITS.md. duo-causeway and hero-duo were not used (see below).
+  - New shot-1 cast (six distinct photos):
+
+    | slot | photo | why |
+    |---|---|---|
+    | 0 hero | hero-rooftop | a woman in aviators looking out of frame under a blazing sunset sky (fx 0.4) |
+    | 1 big top-right | marina-night | cool magenta night: red car, white-suit figure, boats |
+    | 2 under the seal | coupe-desert | sky and palms |
+    | 3 middle-right | neon-closeup | a tense face in cyan and magenta neon |
+    | 4 under the title | marina-skyline | scenery |
+    | 5 bottom-right | moto-causeway | re-cropped (zoom 1.25, fx 0.55, fy 0.5) so the rider sits right of THE FIXER tag, above the band |
+
+  - A/B (out/ab/cmp_step2.jpg): the hero now reads as a film still, not a headshot. Three visible panels each show one
+    clear subject, and two of them are cool night and neon against the warm hero. Shot 1: std 75, bright 0.13, dark
+    0.24, 212.7 KiB.
+  - Hero A/B (out/ab/cmp_hero.jpg): **hero-duo** (fx 0.3) lost to hero-rooftop. Its two faces are smaller and look into
+    the lens, THE CLOSER tag touches the man's hair, and the title hides the red car. It was not copied into the repo.
+  - **duo-causeway** was not used. It is a portrait frame, and in the only open small slot (5) both faces land under
+    THE FIXER tag.
+  - No photo is on more than two shots: coupe-desert and moto-causeway are on shots 1 and 2, marina-skyline on 1 and 3.
+    woman-palms and supercar-boulevard left shot 1 but are still on shot 2.
+- **Step 3: cool contrast per panel (gap 3). Tried, REVERTED.**
+  - Built a per-panel grade:
+    - `slot.gradeId`, falling back to the cover's grade, used in the panel's grade, Sky glow palette, ink paper and
+      cache key
+    - a 'Panel grade' chip row in the right-click panel menu, one undo step
+    - a selftest hash check that a panel without its own grade renders exactly as before
+    - an `&pgrade=` override
+  - Trials, read at 768x432 (out/ab/cmp_step3*.jpg, cmp_pgrade.jpg, cmp_teal.jpg):
+
+    | variant | std / bright / dark | read |
+    |---|---|---|
+    | Neon Night on marina + close-up | 76 / 0.13 / 0.26 | the red car turns purple and the face becomes a flat blue duotone |
+    | Neon Night on marina only | 76 / 0.13 / 0.25 | indigo marina, but the car is purple |
+    | Miami Teal on marina | 74 / 0.13 / 0.22 | teal block, but the car goes maroon and the panel looks muddy |
+    | Miami Teal on both | not measured | the face turns green-teal |
+
+    None was clearly better than step 2: its photo choice already gives a magenta-violet night panel and a neon face.
+    So the code was restored with git. The trial diff is kept locally at out/ab/step3_panel_grade_trial.diff (out/ is
+    not in git).
+
+### Checks (this run)
+- selftest: 22 of 22 pass (after the step 1 and step 2 code changes; the tray now loads 18 samples).
+- dossier.json: 1,097,742 bytes (1.05 MiB of 1.3 MiB), byte-identical across two runs. main.ts still cannot start under
+  `ulimit -v 3000000`, so it ran without the limit, as in every run before.
+- Shot gate: 212.7 / 159.1 / 163.5 / 168.5 KiB. All are ≤ 256 KiB, with the long side ≤ 1280 and the short side ≥ 480.
+  The sheet tool prints GATE OK, and shot 1 reads at cell size.
+- The name grep over app/ prints nothing.
+- Kit `check`: run after the NOTES commit (see the final report of this run).
+
+### Known issues
+- The hero photo's top edge sits just above her hair. The sky is beside her, not above her head, and the zoom cannot
+  go below 1 to show more.
+- `liftToMeanLuminance` in engine/ink.js is no longer called (the no-ink path uses `liftKeepShadows`). It is left
+  exported; remove it in a later clean-up.
+- Shot 2 (the editor) still shows Poster Ink on, and woman-palms / supercar-boulevard in its preview. That is
+  deliberate: it shows the ink feature.
+- The moto rider in slot 5 sits close to THE FIXER tag's right edge (about 0.01 of the cover width apart).
+
+### Next
+- A per-panel grade that keeps the photo's own hues (e.g. a blend of the gradient map with the photo, or a cool tint
+  only on the shadows) would give a cool panel without the purple car. Start from the trial diff.
+- Shot 4's pale motel walls under Sky glow (a wall test), and re-taking shot 2 so it shows the Sky glow toggle.
+
 ## Status: M4 done (run 5, 19 Nov 2026, 18:34-18:55 EET): Sky glow on photo panels + shot 1 A/B
 Short run on LIGHT, not layout. Key Art Slash, the title, the dressing and the Poster Ink look are unchanged.
 
@@ -244,10 +337,10 @@ Shot 1 keeps M1's Poster Ink key-art look and layout (operator decision SHOT1_ST
 ## Shots (screenshots/; no photo on more than two shots)
 | shot | content | file |
 |---|---|---|
-Current set (M4; shots 2-4 from M3b):
+Current set (M5; shots 2-4 from M3b):
 | shot | content | file |
 |---|---|---|
-| 1-cover-1920.jpg | exported 1920x1080: Key Art Slash, Sunset Strip, painterly Poster Ink, Sky glow on, 6 distinct photos (M4) | 1280x720, 207.3 KiB |
+| 1-cover-1920.jpg | exported 1920x1080: Key Art Slash, Sunset Strip, no Poster Ink (crisp grade, deep shadows), Sky glow on, rooftop hero in aviators looking out of frame, neon marina, neon close-up, moto, 6 distinct photos (M5) | 1280x720, 212.7 KiB |
 | 2-editor.jpg | editor 1280x800: Key Art Slash (NIGHT DRIVE), hero selected, 8 layout tiles, grade chips, Poster extras toggles + quote/tag fields, Undo live | 159.1 KiB |
 | 3-cover-1080x1350.jpg | exported 1080x1350: Key Art Slash, Neon Night, SALT & SIRENS, 6 photos | 864x1080, 163.5 KiB |
 | 4-cover-1080.jpg | exported 1080x1080: Key Art Slash from ONE photo (lady-motel) in 5 crops, Golden Hour, MOTEL MIRAGE | 960x960, 168.5 KiB |
