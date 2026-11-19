@@ -1,5 +1,44 @@
 # NOTES (HEATWAVE Cover Studio)
 
+## Status: M3b done (run 4, 19 Nov 2026, 16:50-17:04 EET): Poster extras in the editor + shots 2-4 re-taken
+Short run: steps 3, 4 and 5 only. Shot 1 is M3a's file, untouched (operator decision SHOT1_STYLE=ink).
+
+### What changed
+- **Poster extras** (step 3, cut to the short version): a fieldset in the Caption section (`#poster-extras`, the only
+  new id) with five toggles (Stars & quote, Heat pill, Seal, Panel tags, Billing band), the press-quote field and three
+  panel-tag fields.
+  - State: `state.dressing` (five booleans) plus `caption.quote` and `caption.tags`. The renderer already read
+    `state.dressing`, so this run only added the state and the controls (`bindPosterExtras` / `syncPosterExtras` in
+    editor/controls.js).
+  - Undo: each toggle is one undo step. Quote and tag typing goes through the caption path, so a typing burst within
+    1.2 s is one step.
+  - localStorage: the dressing toggles, quote and tags are saved with the other settings and checked on load (booleans
+    only; quote up to 60 chars; tags up to 28 each).
+  - selftest: 18 checks, all pass (16 before). New: flipping the Seal toggle redraws the preview and is one undo/redo
+    step; billing off, a new quote and tag 2 come back on the next page.
+- **Shots 2-4** (step 4), all in Key Art Slash. Shot scenes now merge the caption over the studio defaults and accept
+  an optional `dressing`.
+  - The 4:5 layout's second tag moved from y 0.55 to 0.705. The "Harbor Run" script used to cover it.
+  - The extras group is compact, so Export PNG stays on screen at 1280x800.
+  - Shot 4's crops stay in the upper half of the photo, above its mint car, so no teal reaches the panels.
+
+### Checks (this run)
+- dossier.json: 1,077,114 bytes (1.03 MiB), byte-identical across two runs. main.ts still cannot start under
+  `ulimit -v 3000000`, so it ran without the limit, as before.
+- Kit `check`: 4 passed, 0 failed. The kit copy is still level 26 while the site is at 27, so the operator may want to
+  re-download it before submitting.
+- Sheet: GATE OK. Shots are 205.8 / 159.1 / 163.5 / 168.5 KiB. All three new covers read at cell size: titles legible,
+  faces are faces.
+- Shot 1 stats: std 81, bright 0.20, unchanged from M3a (M2: std 64, bright 0.06; rival #1: std 77, bright 0.12).
+- The name grep over app/ prints nothing.
+
+### Known issues
+- At rail width the tag fields cut long text short (e.g. "THE DRIVE…"). The text is complete; only the box is narrow.
+- Shot 4 in Golden Hour still has a faint pale sky in one small lower panel. Sunset Strip would remove it, but shots
+  1 and 2 already use that grade.
+- Shots 2 and 1 share five photos, and shots 1 and 3 share man-neon. No photo is on more than two shots.
+- The seal text ("HOT / SUMMER ’26") has no field yet; only the quote and tags are editable.
+
 ## Status: M3a done (run 3, 19 Nov 2026, 16:35-17:00 EET): new shot-1 key art + painterly Poster Ink
 Short run: steps 1, 2 and 5 only. The editor fields for the new pieces (step 3) and new shots 2-4 (step 4) are for
 the next run; shots 2-4 are unchanged M2 files. Operator decision SHOT1_STYLE=ink: shot 1 stays Poster Ink.
@@ -134,13 +173,17 @@ Shot 1 keeps M1's Poster Ink key-art look and layout (operator decision SHOT1_ST
 ## Shots (screenshots/; no photo on more than two shots)
 | shot | content | file |
 |---|---|---|
-| 1-cover-1920.jpg | exported 1920x1080: Key Art Nine, Sunset Strip, Poster Ink, 9 distinct photos | 1280x720, 227.7 KiB (budget 230) |
-| 2-editor.jpg | editor 1280x800: Hero + Four with Poster Ink, hero selected, 7 layout tiles, 5 grade chips, captions, Undo live | 169.8 KiB (budget 170) |
-| 3-cover-1080x1350.jpg | exported 1080x1350: Snapshots, Neon Night, 5 photos | 864x1080, 159.6 KiB |
-| 4-cover-1080.jpg | exported 1080x1080: Grid Four from ONE photo (flamingo-boardwalk), Miami Teal | 960x960, 155.1 KiB |
+Current set (M3b):
+| shot | content | file |
+|---|---|---|
+| 1-cover-1920.jpg | exported 1920x1080: Key Art Slash, Sunset Strip, painterly Poster Ink, 6 distinct photos (M3a) | 1280x720, 205.8 KiB |
+| 2-editor.jpg | editor 1280x800: Key Art Slash (NIGHT DRIVE), hero selected, 8 layout tiles, grade chips, Poster extras toggles + quote/tag fields, Undo live | 159.1 KiB |
+| 3-cover-1080x1350.jpg | exported 1080x1350: Key Art Slash, Neon Night, SALT & SIRENS, 6 photos | 864x1080, 163.5 KiB |
+| 4-cover-1080.jpg | exported 1080x1080: Key Art Slash from ONE photo (lady-motel) in 5 crops, Golden Hour, MOTEL MIRAGE | 960x960, 168.5 KiB |
+
 The method is the same as M1: Playwright clicks Export, saves the PNG and redraws it scaled into a JPEG.
-Grade choice for shot 4: Noir Heat and Golden Hour turned this night photo brown, and Neon Night was too close to
-shot 3, so Miami Teal won.
+M2's set (for history): Key Art Nine / Hero + Four editor / Snapshots in Neon Night / Grid Four in Miami Teal from
+flamingo-boardwalk.
 
 ## Numbers (headless Chromium, this machine)
 - First 1920x1080 Key Art Nine render with Poster Ink (scene render): 215-290 ms. A cached export takes about 5 ms.
