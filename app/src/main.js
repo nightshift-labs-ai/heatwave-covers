@@ -1,48 +1,155 @@
-// HEATWAVE Cover Studio: boots the editor, keeps the live preview in sync, exports the PNG.
-import { loadPhotoUrl } from './photos.js';
+// HEATWAVE Cover Studio: boots the editor (photo tray, live preview with per-panel crop, layout / grade / ink /
+// caption / size controls, Export PNG) and keeps the 3-step strip lit as you go.
+import { loadPhotoFiles, loadPhotoUrl, autoFillPanels } from './photos.js';
+import { bindPreviewPointer, drawSelectionOverlay, zoomPanel } from './editor/panels.js';
+import {
+  buildLayoutTiles, syncLayoutTiles, buildGradeSwatches, syncGradeSwatches, bindInkControls, bindCaptionFields,
+  buildSizeButtons, syncSizeButtons, renderPhotoTray,
+} from './editor/controls.js';
 import { renderCover, exportCoverPng, ensureCoverAssets } from './engine/render.js';
-import { createStudioState } from './state.js';
+import { createStudioState, pushHistory, undo, redo } from './state.js';
+
+const SAMPLE_PHOTOS = ['woman-palms', 'lady-motel', 'man-neon', 'pool-neon', 'coupe-desert', 'speedboat', 'moto-causeway', 'couple-pier', 'boulevard', 'pier'];
 
 export async function bootHeatwaveStudio() {
   const state = createStudioState();
-  const canvas = document.getElementById('cover-preview');
-  const status = document.getElementById('export-status');
+  const $ = (id) => document.getElementById(id);
+  const canvas = $('cover-preview');
+  const status = $('export-status');
+  const pill = document.querySelector('.drag-pill');
+  const zoom = $('crop-zoom');
+  let queued = 0;
 
-  function refresh() {
+  // Live preview: the cover at <= 960 px on its long side, plus the selection overlay and the drag pill.
+  function refresh(fast = false) {
     const s = Math.min(960 / state.size.w, 960 / state.size.h);
     const w = Math.round(state.size.w * s), h = Math.round(state.size.h * s);
     if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
-    renderCover(state, w, h, canvas.getContext('2d'));
+    const ctx = canvas.getContext('2d');
+    renderCover(state, w, h, ctx, { fastPanel: fast ? state.selected : -1 });
+    const p = drawSelectionOverlay(ctx, state, w, h);
+    placePill(p, w, h);
+    syncSteps();
+  }
+  function scheduleRefresh() {
+    if (queued) return;
+    queued = requestAnimationFrame(() => { queued = 0; refresh(false); });
+  }
+  function placePill(p, w, h) {
+    pill.hidden = !p;
+    if (!p) return;
+    const r = canvas.getBoundingClientRect(), host = canvas.parentElement.getBoundingClientRect();
+    const k = r.width / w;
+    pill.style.left = `${r.left - host.left + (p.x + p.w / 2) * k}px`;
+    pill.style.top = `${r.top - host.top + (p.y + p.h / 2) * k}px`;
+  }
+  function syncSteps() {
     document.querySelectorAll('.step-strip li').forEach((li) => {
       const n = +li.dataset.step;
       li.classList.toggle('done', n < state.step);
       li.classList.toggle('active', n === state.step);
     });
   }
+  function syncControls() {
+    $('caption-title').value = state.caption.title;
+    $('caption-subtitle').value = state.caption.subtitle;
+    $('caption-tagline').value = state.caption.tagline;
+    $('ink-toggle').checked = state.ink.on;
+    document.querySelector('.ink-strength').value = state.ink.strength;
+    syncLayoutTiles($('layout-tiles'), state);
+    syncGradeSwatches($('grade-swatches'), state);
+    syncSizeButtons($('size-buttons'), state);
+    syncZoom();
+    renderPhotoTray($('photo-tray'), state, putPhotoInSelectedPanel);
+  }
+  function syncZoom() {
+    const slot = state.panels[state.selected];
+    zoom.value = slot ? slot.zoom : 1;
+    zoom.disabled = !slot;
+  }
+  function onChange(kind) {
+    if (kind === 'layout') { pushHistory(state); autoFillPanels(state); state.selected = -1; state.step = Math.max(state.step, 3); }
+    if (kind === 'grade' || kind === 'ink' || kind === 'size') state.step = Math.max(state.step, state.photos.length ? 3 : 1);
+    syncControls();
+    scheduleRefresh();
+  }
 
+  async function addPhotos(photos) {
+    if (!photos.length) return;
+    pushHistory(state);
+    state.photos.push(...photos);
+    autoFillPanels(state);
+    state.step = Math.max(state.step, 2);
+    status.textContent = `${state.photos.length} photo${state.photos.length > 1 ? 's' : ''} ready. Pick a layout, then export.`;
+    await ensureCoverAssets(state);
+    syncControls();
+    refresh();
+  }
   async function addSamplePhotos(names) {
     const photos = await Promise.all(names.map((n) => loadPhotoUrl(`samples/${n}.jpg`, n)));
     state.photos.push(...photos);
     return photos;
   }
-
-  function syncControls() {
-    document.getElementById('caption-title').value = state.caption.title;
-    document.getElementById('caption-subtitle').value = state.caption.subtitle;
-    document.getElementById('caption-tagline').value = state.caption.tagline;
+  function putPhotoInSelectedPanel(i) {
+    let target = state.selected;
+    if (target < 0) target = state.panels.findIndex((p) => !p || p.photo < 0);
+    if (target < 0) target = 0;
+    pushHistory(state);
+    state.panels[target] = { photo: i, zoom: 1, fx: 0.5, fy: 0.38 };
+    state.selected = target;
+    syncControls();
+    refresh();
   }
 
-  document.getElementById('export-png').addEventListener('click', async () => {
-    status.textContent = 'Rendering…';
+  // Photo input, drop zone (and the whole page), paste.
+  $('photo-input').addEventListener('change', async (e) => { await addPhotos(await loadPhotoFiles(e.target.files)); e.target.value = ''; });
+  const drop = $('drop-zone');
+  document.addEventListener('dragover', (e) => { e.preventDefault(); drop.classList.add('over'); });
+  document.addEventListener('dragleave', () => drop.classList.remove('over'));
+  document.addEventListener('drop', async (e) => { e.preventDefault(); drop.classList.remove('over'); await addPhotos(await loadPhotoFiles(e.dataTransfer.files)); });
+  document.addEventListener('paste', async (e) => { await addPhotos(await loadPhotoFiles([...e.clipboardData.files])); });
+  document.querySelector('.btn-samples').addEventListener('click', async () => {
+    const fresh = SAMPLE_PHOTOS.filter((n) => !state.photos.some((p) => p.name === n));
+    await addPhotos(await Promise.all(fresh.map((n) => loadPhotoUrl(`samples/${n}.jpg`, n))));
+  });
+  document.querySelector('.btn-autofill').addEventListener('click', () => { pushHistory(state); autoFillPanels(state); syncControls(); refresh(); });
+
+  // Panel crop: drag / wheel on the preview, slider and +- buttons under it.
+  bindPreviewPointer(canvas, state, { refresh, commit: () => pushHistory(state), changed: syncZoom });
+  zoom.addEventListener('input', () => { zoomPanel(state, state.selected, +zoom.value); refresh(true); });
+  zoom.addEventListener('change', () => refresh(false));
+  const nudge = (f) => { const s = state.panels[state.selected]; if (!s) return; pushHistory(state); zoomPanel(state, state.selected, s.zoom * f); syncZoom(); refresh(); };
+  document.querySelector('.zoom-in').addEventListener('click', () => nudge(1.15));
+  document.querySelector('.zoom-out').addEventListener('click', () => nudge(1 / 1.15));
+  document.querySelector('.reset-crop').addEventListener('click', () => {
+    const s = state.panels[state.selected]; if (!s) return;
+    pushHistory(state); Object.assign(s, { zoom: 1, fx: 0.5, fy: 0.38 }); syncZoom(); refresh();
+  });
+
+  buildLayoutTiles($('layout-tiles'), state, onChange);
+  buildGradeSwatches($('grade-swatches'), state, onChange);
+  buildSizeButtons($('size-buttons'), state, onChange);
+  bindInkControls($('ink-toggle'), document.querySelector('.ink-strength'), state, onChange);
+  bindCaptionFields({ title: $('caption-title'), subtitle: $('caption-subtitle'), tagline: $('caption-tagline') }, state, onChange);
+
+  $('export-png').addEventListener('click', async () => {
+    status.textContent = `Rendering ${state.size.w} × ${state.size.h}…`;
     const { ms, name } = await exportCoverPng(state, state.size.w, state.size.h);
     window.__lastExport = { ms, name };
     state.step = 3;
-    refresh();
+    syncSteps();
     status.textContent = `Saved ${name} (rendered in ${ms} ms).`;
   });
+  document.addEventListener('keydown', (e) => {
+    if (!(e.ctrlKey || e.metaKey) || e.key.toLowerCase() !== 'z') return;
+    e.preventDefault();
+    if (e.shiftKey ? redo(state) : undo(state)) { syncControls(); refresh(); }
+  });
+  window.addEventListener('resize', () => refresh());
 
   const studio = { state, refresh, addSamplePhotos, syncControls };
   await ensureCoverAssets(state);
+  syncControls();
   refresh();
   const shot = new URLSearchParams(location.search).get('shot');
   if (shot) {

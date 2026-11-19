@@ -64,6 +64,8 @@ export async function runShotScene(name, studio) {
   await ensureCoverAssets(state);
   studio.syncControls();
   studio.refresh();
+  document.getElementById('export-status').textContent =
+    `${state.photos.length} photos ready. Drag the pink panel to reframe it, then Export PNG.`;
   if (!scene.editor) {
     const c = document.createElement('canvas');
     c.width = state.size.w; c.height = state.size.h;
