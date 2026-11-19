@@ -65,14 +65,14 @@ export function skyMaskBeforeGrade(imageData, skin = null) {
   if (guard) {
     skinNear = new Float32Array(n);
     for (let p = 0; p < n; p++) skinNear[p] = guard[p];
-    boxBlur(skinNear, w, h, r * 2); boxBlur(skinNear, w, h, r * 2);
+    boxBlur(skinNear, w, h, r); boxBlur(skinNear, w, h, r);
   }
   for (let y = 0; y < h; y++) {
     const fy = y / h, fade = fy < 0.62 ? 1 : fy > 0.9 ? 0 : 1 - smooth((fy - 0.62) / 0.28);
     for (let x = 0; x < w; x++) {
       const p = y * w + x;
       let v = Math.min(1, m[p] * 1.15) * fade;
-      if (guard) v = guard[p] ? 0 : v * Math.max(0, 1 - skinNear[p] * 2.5);
+      if (guard) v = guard[p] ? 0 : v * Math.max(0, 1 - skinNear[p] * 1.6);
       m[p] = v;
     }
   }
