@@ -1,5 +1,52 @@
 # NOTES (HEATWAVE Cover Studio)
 
+## Status: M7 done (run 8, 19 Nov 2026, 21:03-21:13 EET): one more story beat on shot 1, contrast kept
+Short run on shot 1 at the dev judge's size (1024x576; the judge sees only shot 1). Everything M5 has is kept: the
+rooftop hero, the HEATWAVE title and script, all dressing, the crisp no-ink look, Sky glow, and the neon marina night
+panel at its M5 size and position. Shots 2-4 are untouched. (The M6 try, a bigger re-slot with a man close-up, a
+couple and a speedboat, was not kept: it shrank the marina to a sliver under the HEAT pill and put the speedboat
+partly under the title, so the cover went all warm.)
+
+### What changed
+- New layout variant Key Art Slash Plus (engine/layouts.js, `keyArtSlashPlus`; shot 1 only, not in the layout
+  picker, so the editor and shot 2 keep plain Key Art Slash). It is Key Art Slash with a seventh slanted panel cut
+  from the hero's empty right-hand sky at top-middle (art x 0.452-0.6, y 0-0.42), between the hero and the marina.
+  It sits clear of the title, script, quote line, seal (on its bottom-right corner, at the same junction as before)
+  and the HEAT pill. The hero polygon gets a notch but keeps the same bounding box, so its crop is unchanged and
+  it stays the biggest image. Panels 1-5 are byte-for-byte the M5 polygons.
+- Shot 1 (dev/shot-scenes.js, `cover-keyart`): layout `keyArtSlashPlus`; the new panel shows the daytime speedboat
+  by the towers (`speedboat`, already in app/samples, credited; zoom 1.2, fx 0.5, fy 0.55). Seven distinct photos.
+  No photos were added this run. No tag sits on a face or rider (the tags are unchanged; the new panel has none).
+- main.ts header line about shot 1 now names Key Art Slash Plus and the speedboat panel.
+
+### A/B at 1024x576 (out/ab/before_1024.jpg = M5, out/ab/m6_tried_1024.jpg, out/ab/after_m7_1024.jpg): KEPT
+Read in that order. M7 reads as M5 plus one beat: the white speedboat on the water under the high-rises reads as
+one clear subject in its own panel; the neon marina night (red car, white-suit figure) is the same size and as
+visible as in M5, so the warm/cool contrast is intact; the hero's face, hair and aviators are untouched (her hair
+ends well left of the new panel); the title, script, quote, seal and pill are where they were. Unlike M6 nothing
+shrinks or slides under the title. Cost: a slice of the hero's sunset sky. Readable story panels go from 3 to 4
+(plus the hero). The speedboat panel is warm-graded by Sunset Strip, so it adds a beat more than it adds blue.
+
+### Checks (this run)
+- Judge-sheet preview: GATE OK.
+- Shots: 1 = 1280x720, 226,731 B (221.4 KiB); 2 = 1280x800, 162,895 B; 3 = 864x1080, 167,377 B; 4 = 960x960,
+  172,510 B. All <= 256 KiB, long side <= 1280, short side >= 480.
+- Dossier: 1,110,550 B, byte-identical on two runs (rm before each), <= 1.3 MiB.
+- Name grep over app/: prints nothing.
+- Selftest: 22/22 ok, no page errors (app/src changed).
+- Kit check: 4 passed, 0 failed, 17 skipped, 5 checked at submission.
+
+### Known issues
+- The speedboat panel is small at judge size (about 140x200 px at 1024x576) and warm-graded; it reads, but less
+  strongly than the right-column panels.
+- Key Art Slash Plus exists only for 16:9 (it spreads Key Art Slash's square and tall specs unchanged) and is not
+  offered in the editor's layout picker.
+
+### Next
+- Try a second daytime beat that is truly sea-blue (e.g. duo-causeway or the speedboat with a per-panel cool
+  grade) in a clear zone, without touching the marina panel; A/B at 1024x576 again.
+- Consider offering Key Art Slash Plus in the picker (the selftest counts 8 layout tiles, so update it then).
+
 ## Status: M5 done (run 6, 19 Nov 2026, 19:42-20:16 EET): crisp shot 1 + a cinematic hero
 Short run on shot 1's ART at judge size (768x432). Key Art Slash, the HEATWAVE title, the dressing and Sky glow are
 unchanged. Shots 2-4 are untouched (M3b files).
@@ -337,10 +384,10 @@ Shot 1 keeps M1's Poster Ink key-art look and layout (operator decision SHOT1_ST
 ## Shots (screenshots/; no photo on more than two shots)
 | shot | content | file |
 |---|---|---|
-Current set (M5; shots 2-4 from M3b):
+Current set (M7; shots 2-4 from M3b):
 | shot | content | file |
 |---|---|---|
-| 1-cover-1920.jpg | exported 1920x1080: Key Art Slash, Sunset Strip, no Poster Ink (crisp grade, deep shadows), Sky glow on, rooftop hero in aviators looking out of frame, neon marina, neon close-up, moto, 6 distinct photos (M5) | 1280x720, 212.7 KiB |
+| 1-cover-1920.jpg | exported 1920x1080: Key Art Slash Plus, Sunset Strip, no Poster Ink (crisp grade, deep shadows), Sky glow on, rooftop hero in aviators looking out of frame, speedboat by the towers (top-middle), neon marina, neon close-up, moto, 7 distinct photos (M7) | 1280x720, 221.4 KiB |
 | 2-editor.jpg | editor 1280x800: Key Art Slash (NIGHT DRIVE), hero selected, 8 layout tiles, grade chips, Poster extras toggles + quote/tag fields, Undo live | 159.1 KiB |
 | 3-cover-1080x1350.jpg | exported 1080x1350: Key Art Slash, Neon Night, SALT & SIRENS, 6 photos | 864x1080, 163.5 KiB |
 | 4-cover-1080.jpg | exported 1080x1080: Key Art Slash from ONE photo (lady-motel) in 5 crops, Golden Hour, MOTEL MIRAGE | 960x960, 168.5 KiB |
