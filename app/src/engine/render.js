@@ -3,7 +3,7 @@
 
 import { layoutFor } from './layouts.js';
 import { applyGradeToPanel, gradeColorAt, autoLevelsBeforeGrade } from './grades.js';
-import { posterInk, smoothForInk, grainAndVignette, liftToMeanLuminance } from './ink.js';
+import { posterInk, smoothForInk, grainAndVignette, liftToMeanLuminance, skinMaskBeforeGrade } from './ink.js';
 import { drawTitleBlock, drawHalftoneSun, drawStickerBadge } from './lettering.js';
 
 // Draw the whole cover for `state` into ctx at W x H. opts.fastPanel: index of a panel being dragged (drawn with
@@ -98,10 +98,11 @@ function panelArt(photo, slot, pw, ph, state, W, i, fast) {
   const cctx = c.getContext('2d', { willReadFrequently: true });
   drawCrop(cctx, photo, slot, pw, ph);
   const data = cctx.getImageData(0, 0, pw, ph);
+  const skin = ink ? skinMaskBeforeGrade(data) : null;
   const lumHalf = ink ? smoothForInk(data, W) : null;
   autoLevelsBeforeGrade(data);
   applyGradeToPanel(data, state.gradeId);
-  if (ink) posterInk(data, lumHalf, { coverW: W, strength: state.ink.strength, paper: gradeColorAt(state.gradeId, 0.5), seed: 17 + i * 101 });
+  if (ink) posterInk(data, lumHalf, { coverW: W, strength: state.ink.strength, paper: gradeColorAt(state.gradeId, 0.5), seed: 17 + i * 101, skin });
   else liftToMeanLuminance(data, 0.44);
   grainAndVignette(data, 911 + i * 37);
   cctx.putImageData(data, 0, 0);

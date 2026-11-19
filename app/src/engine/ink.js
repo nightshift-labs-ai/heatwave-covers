@@ -4,21 +4,42 @@
 
 const INK = [18, 10, 28]; // #120a1c
 
-// Full Poster Ink pass on one graded panel. lumHalf comes from smoothForInk(), taken before the grade.
-export function posterInk(imageData, lumHalf, { coverW, strength = 0.8, paper = [200, 80, 120], seed = 1 }) {
+// Full Poster Ink pass on one graded panel. lumHalf comes from smoothForInk(), taken before the grade; skin comes from
+// skinMaskBeforeGrade() (1 = skin-coloured pixel), so faces get lighter lines and no dots.
+// Ink weight follows the panel: a 200 px strip gets 1 px lines and fewer of them, a hero panel the full W/640 weight.
+export function posterInk(imageData, lumHalf, { coverW, strength = 0.8, paper = [200, 80, 120], seed = 1, skin = null }) {
   const s = Math.max(0, Math.min(1, strength));
   if (s <= 0) return imageData;
+  const short = Math.min(imageData.width, imageData.height);
+  const sizeK = Math.max(0, Math.min(1, (short - 160) / 440)); // 0 for a small strip, 1 for a hero panel
   posterize(imageData, 5, s);
   liftToMeanLuminance(imageData, 0.47);
-  halftoneShadows(imageData, { cell: Math.max(4, Math.round(coverW / 150)), paper, strength: s });
-  sobelInkLines(imageData, lumHalf, { lineWidth: Math.max(2, Math.round(coverW / 640)), alpha: 0.85 * s });
+  halftoneShadows(imageData, { cell: Math.max(4, Math.round(coverW / 150)), paper, strength: s, skin });
+  sobelInkLines(imageData, lumHalf, {
+    lineWidth: Math.max(1, Math.round((coverW / 640) * (0.5 + 0.5 * sizeK))),
+    alpha: 0.85 * s, keep: 0.08 + 0.04 * sizeK, skin,
+  });
   return imageData;
 }
 
-// Halftone dots where the panel is darker than 0.28: shadows become dot screens on a lifted "paper" tone.
-export function halftoneShadows(imageData, { cell, paper, strength }) {
+// Skin mask from the crop before the grade (a classic RGB skin-tone rule, per pixel). The grade recolours
+// everything, so this is the only point where skin can still be told apart.
+export function skinMaskBeforeGrade(imageData) {
   const { width: w, height: h, data: d } = imageData;
-  const cutoff = 0.28 * 255;
+  const m = new Uint8Array(w * h);
+  for (let p = 0, i = 0; p < m.length; p++, i += 4) {
+    const r = d[i], g = d[i + 1], b = d[i + 2];
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+    m[p] = r > 90 && g > 40 && b > 20 && r > g && r > b && mx - mn > 18 && r - g > 12 && r - g < 110 && g > b * 0.9 ? 1 : 0;
+  }
+  return m;
+}
+
+// Halftone dots only in the deep shadows (darker than 0.22, never on skin): shadows become dot screens on a lightly
+// lifted "paper" tone, mid-tones stay flat colour.
+export function halftoneShadows(imageData, { cell, paper, strength, skin = null }) {
+  const { width: w, height: h, data: d } = imageData;
+  const cutoff = 0.22 * 255;
   for (let cy = 0; cy < h; cy += cell) {
     for (let cx = 0; cx < w; cx += cell) {
       const x1 = Math.min(w, cx + cell), y1 = Math.min(h, cy + cell);
@@ -32,11 +53,11 @@ export function halftoneShadows(imageData, { cell, paper, strength }) {
       for (let y = cy; y < y1; y++) {
         for (let x = cx; x < x1; x++) {
           const i = (y * w + x) * 4;
-          if (lum(d, i) > cutoff) continue;
+          if (lum(d, i) > cutoff || (skin && skin[y * w + x])) continue;
           const dx = x + 0.5 - mx, dy = y + 0.5 - my;
           const inDot = dx * dx + dy * dy <= r2;
           const target = inDot ? INK : paper;
-          const a = (inDot ? 0.8 : 0.32) * strength;
+          const a = (inDot ? 0.75 : 0.22) * strength;
           d[i] += (target[0] - d[i]) * a; d[i + 1] += (target[1] - d[i + 1]) * a; d[i + 2] += (target[2] - d[i + 2]) * a;
         }
       }
@@ -45,8 +66,9 @@ export function halftoneShadows(imageData, { cell, paper, strength }) {
   return imageData;
 }
 
-// Ink lines: Sobel magnitude on a half-size luminance copy, keep the strongest 12 %, dilate, draw in #120a1c.
-export function sobelInkLines(imageData, lumHalf, { lineWidth, alpha }) {
+// Ink lines: Sobel magnitude on a half-size luminance copy, keep the strongest 8-12 % (fewer in small panels),
+// dilate, draw in #120a1c; on skin the line is drawn at 40 % so faces read as faces, not as cracks.
+export function sobelInkLines(imageData, lumHalf, { lineWidth, alpha, keep = 0.12, skin = null }) {
   const { width: w, height: h, data: d } = imageData;
   const { w: hw, h: hh } = lumHalf;
   const L = smooth3(lumHalf.lum, hw, hh);
@@ -65,7 +87,7 @@ export function sobelInkLines(imageData, lumHalf, { lineWidth, alpha }) {
     }
   }
   let thr = 0, acc = 0;
-  const want = count * 0.88;
+  const want = count * (1 - keep);
   for (let b = 0; b < 1024; b++) { acc += hist[b]; if (acc >= want) { thr = b; break; } }
   thr = Math.max(thr, 72);
   // Edge mask at full size (nearest upsample of the half-size mask), then a square dilation.
@@ -78,7 +100,8 @@ export function sobelInkLines(imageData, lumHalf, { lineWidth, alpha }) {
   if (r > 0) mask = dilate(mask, w, h, r);
   for (let p = 0, i = 0; p < mask.length; p++, i += 4) {
     if (!mask[p]) continue;
-    d[i] += (INK[0] - d[i]) * alpha; d[i + 1] += (INK[1] - d[i + 1]) * alpha; d[i + 2] += (INK[2] - d[i + 2]) * alpha;
+    const a = skin && skin[p] ? alpha * 0.4 : alpha;
+    d[i] += (INK[0] - d[i]) * a; d[i + 1] += (INK[1] - d[i + 1]) * a; d[i + 2] += (INK[2] - d[i + 2]) * a;
   }
   return imageData;
 }

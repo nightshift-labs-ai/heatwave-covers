@@ -8,20 +8,21 @@ const SCENES = {
   'cover-keyart': {
     layoutId: 'keyArtNine', gradeId: 'sunsetStrip', size: [1920, 1080],
     caption: { title: 'HEATWAVE', subtitle: 'Coastline Nights', tagline: 'IN STORES SOMEWHERE SOON' },
-    photos: ['woman-palms', 'lady-motel', 'man-neon', 'pool-neon', 'coupe-desert', 'speedboat', 'moto-causeway', 'couple-pier'],
+    // Nine distinct photos, no face twice: hero, small wide column (skyline, neon motel, speedboat), tall row
+    // (four faces), big right panel (the supercar).
+    photos: ['woman-palms', 'marina-skyline', 'coupe-desert', 'speedboat', 'lady-motel', 'man-neon', 'pier-fisher', 'flamingo-boardwalk', 'supercar-boulevard'],
     panels: [
-      // hero, then the small wide column (bright scenes + one close-up), the tall row (portraits), the big right panel
       { photo: 0, zoom: 1, fx: 0.5, fy: 0.3 },
-      { photo: 4, zoom: 1.1, fx: 0.5, fy: 0.45 }, { photo: 0, zoom: 2.1, fx: 0.44, fy: 0.27 }, { photo: 5, zoom: 1.1, fx: 0.5, fy: 0.45 },
-      { photo: 1, zoom: 1, fx: 0.5, fy: 0.3 }, { photo: 3, zoom: 1.15, fx: 0.45, fy: 0.36 }, { photo: 6, zoom: 1, fx: 0.5, fy: 0.4 }, { photo: 7, zoom: 1.1, fx: 0.5, fy: 0.35 },
-      { photo: 2, zoom: 1.1, fx: 0.55, fy: 0.35 },
+      { photo: 1, zoom: 1.15, fx: 0.4, fy: 0.42 }, { photo: 2, zoom: 1.1, fx: 0.5, fy: 0.5 }, { photo: 3, zoom: 1.3, fx: 0.5, fy: 0.6 },
+      { photo: 4, zoom: 1.6, fx: 0.6, fy: 0.24 }, { photo: 5, zoom: 1.05, fx: 0.6, fy: 0.4 }, { photo: 6, zoom: 1.3, fx: 0.36, fy: 0.36 }, { photo: 7, zoom: 1.15, fx: 0.55, fy: 0.3 },
+      { photo: 8, zoom: 1.05, fx: 0.52, fy: 0.55 },
     ],
   },
   // Shot 3: 1080 x 1350, tilted snapshots over a neon sky.
   'cover-tall': {
     layoutId: 'tiltedSnapshots', gradeId: 'neonNight', size: [1080, 1350],
     caption: { title: 'SALT & SIRENS', subtitle: 'Harbor Run', tagline: 'ONE NIGHT ON THE WATERFRONT' },
-    photos: ['couple-pier', 'speedboat', 'pool-neon', 'man-neon', 'lady-motel'],
+    photos: ['couple-pier', 'marina-skyline', 'pool-neon', 'man-neon', 'motel-rain'],
     panels: [
       { photo: 0, zoom: 1, fx: 0.5, fy: 0.38 }, { photo: 1, zoom: 1, fx: 0.5, fy: 0.4 },
       { photo: 2, zoom: 1, fx: 0.5, fy: 0.4 }, { photo: 3, zoom: 1.1, fx: 0.5, fy: 0.35 }, { photo: 4, zoom: 1, fx: 0.5, fy: 0.3 },
