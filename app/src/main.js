@@ -18,7 +18,8 @@ import { GRADES, GRADE_ORDER } from './engine/grades.js';
 
 const SAMPLE_PHOTOS = [
   'supercar-boulevard', 'woman-palms', 'lady-motel', 'man-neon', 'motel-rain', 'flamingo-boardwalk', 'pier-fisher',
-  'marina-skyline', 'pool-neon', 'coupe-desert', 'speedboat', 'moto-causeway', 'couple-pier', 'boulevard', 'pier',
+  'marina-skyline', 'pool-neon', 'coupe-desert', 'speedboat', 'moto-causeway', 'couple-pier', 'hero-rooftop',
+  'marina-night', 'neon-closeup', 'boulevard', 'pier',
 ];
 
 export async function bootHeatwaveStudio() {

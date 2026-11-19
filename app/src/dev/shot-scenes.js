@@ -5,18 +5,19 @@ import { ensureCoverAssets, renderCover } from '../engine/render.js';
 import { pushHistory } from '../state.js';
 
 const SCENES = {
-  // Shot 1: 1920 x 1080, Key Art Slash, Sunset Strip, Poster Ink off (ink: 0; crisp at judge size), six distinct photos: the hero face, the
-  // supercar in the second-largest panel, a sunset sky (under the title's end), a second face in the free middle-right
-  // panel, the speedboat and the motorbike.
+  // Shot 1: 1920 x 1080, Key Art Slash, Sunset Strip, Poster Ink off (ink: 0; crisp at judge size), six distinct photos: the rooftop hero
+  // (sunglasses, looking out of frame, sunset sky), the neon marina night in the second-largest panel, a sunset sky
+  // (under the seal and the title's end), the neon close-up in the free middle-right panel, the marina skyline under
+  // the title, and the motorbike cropped so the rider sits right of the third tag and above the band.
   'cover-keyart': {
     layoutId: 'keyArtSlash', gradeId: 'sunsetStrip', size: [1920, 1080], ink: 0,
     caption: { title: 'HEATWAVE', subtitle: 'Coastline Nights', tagline: 'ONE COASTLINE · SIX STORIES · NO CURFEW' },
-    photos: ['woman-palms', 'supercar-boulevard', 'coupe-desert', 'man-neon', 'speedboat', 'moto-causeway'],
+    photos: ['hero-rooftop', 'marina-night', 'coupe-desert', 'neon-closeup', 'marina-skyline', 'moto-causeway'],
     panels: [
-      { photo: 0, zoom: 1, fx: 0.5, fy: 0.3 },
-      { photo: 1, zoom: 1.05, fx: 0.52, fy: 0.5 },
-      { photo: 2, zoom: 1.1, fx: 0.5, fy: 0.36 }, { photo: 3, zoom: 1.25, fx: 0.55, fy: 0.3 },
-      { photo: 4, zoom: 1.2, fx: 0.5, fy: 0.55 }, { photo: 5, zoom: 1.1, fx: 0.5, fy: 0.45 },
+      { photo: 0, zoom: 1, fx: 0.4, fy: 0.3 },
+      { photo: 1, zoom: 1, fx: 0.5, fy: 0.5 },
+      { photo: 2, zoom: 1.1, fx: 0.5, fy: 0.36 }, { photo: 3, zoom: 1.05, fx: 0.57, fy: 0.4 },
+      { photo: 4, zoom: 1.1, fx: 0.5, fy: 0.45 }, { photo: 5, zoom: 1.25, fx: 0.55, fy: 0.5 },
     ],
   },
   // Shot 3: 1080 x 1350, Key Art Slash in Neon Night: the couple on the pier as the hero, the fisher and the neon man
