@@ -254,7 +254,7 @@ export function drawBilling(ctx, b, text = DRESSING_DEFAULTS.billing) {
   ctx.font = `500 ${fs.toFixed(1)}px Teko`;
   ctx.letterSpacing = `${(fs * 0.12).toFixed(1)}px`;
   ctx.fillStyle = 'rgba(246,239,224,0.78)'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText(text, b.x + b.w / 2, b.y + b.h * 0.56, b.w * 0.76);
+  ctx.fillText(text, b.x + b.w / 2, b.y + b.h * 0.56, b.w - 2 * b.h * 4.6);
   ctx.font = `400 ${(b.h * 0.6).toFixed(1)}px Anton`;
   ctx.letterSpacing = '0px'; ctx.textAlign = 'left'; ctx.fillStyle = '#ff8a3d';
   ctx.fillText('HW', b.x + b.h * 0.5, b.y + b.h * 0.56);
