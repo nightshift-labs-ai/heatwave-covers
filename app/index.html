@@ -80,6 +80,22 @@
     <input id="caption-title" class="field" type="text" maxlength="24" value="HEATWAVE" aria-label="Title">
     <input id="caption-subtitle" class="field" type="text" maxlength="32" value="Coastline Nights" aria-label="Subtitle">
     <input id="caption-tagline" class="field" type="text" maxlength="40" value="IN STORES SOMEWHERE SOON" aria-label="Tagline">
+    <fieldset id="poster-extras" class="extras">
+      <legend>Poster extras</legend>
+      <div class="extras-toggles">
+        <label><input type="checkbox" data-extra="stars" checked> Stars &amp; quote</label>
+        <label><input type="checkbox" data-extra="heat" checked> Heat pill</label>
+        <label><input type="checkbox" data-extra="seal" checked> Seal</label>
+        <label><input type="checkbox" data-extra="tags" checked> Panel tags</label>
+        <label><input type="checkbox" data-extra="billing" checked> Billing band</label>
+      </div>
+      <input class="field field-sm" data-quote type="text" maxlength="60" aria-label="Press quote" placeholder="Press quote">
+      <div class="extras-tags">
+        <input class="field field-sm" data-tag="0" type="text" maxlength="28" aria-label="Panel tag 1" placeholder="Tag 1">
+        <input class="field field-sm" data-tag="1" type="text" maxlength="28" aria-label="Panel tag 2" placeholder="Tag 2">
+        <input class="field field-sm" data-tag="2" type="text" maxlength="28" aria-label="Panel tag 3" placeholder="Tag 3">
+      </div>
+    </fieldset>
     <h2>Size</h2>
     <div id="size-buttons" class="size-buttons"></div>
     <button id="export-png" class="btn btn-export" type="button">Export PNG</button>

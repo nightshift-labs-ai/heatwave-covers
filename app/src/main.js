@@ -6,6 +6,7 @@ import { bindTitleDoubleClickEdit } from './editor/title-edit.js';
 import { bindPanelMenu } from './editor/panel-menu.js';
 import {
   buildLayoutTiles, syncLayoutTiles, buildGradeSwatches, syncGradeSwatches, bindInkControls, bindCaptionFields,
+  bindPosterExtras, syncPosterExtras,
   buildSizeButtons, syncSizeButtons, renderPhotoTray,
 } from './editor/controls.js';
 import { renderCover, exportCoverPng, ensureCoverAssets } from './engine/render.js';
@@ -80,6 +81,7 @@ export async function bootHeatwaveStudio() {
     $('caption-title').value = state.caption.title;
     $('caption-subtitle').value = state.caption.subtitle;
     $('caption-tagline').value = state.caption.tagline;
+    syncPosterExtras($('poster-extras'), state);
     $('ink-toggle').checked = state.ink.on;
     document.querySelector('.ink-strength').value = state.ink.strength;
     syncLayoutTiles($('layout-tiles'), state);
@@ -201,6 +203,7 @@ export async function bootHeatwaveStudio() {
   buildSizeButtons($('size-buttons'), state, onChange);
   bindInkControls($('ink-toggle'), document.querySelector('.ink-strength'), state, onChange);
   bindCaptionFields({ title: $('caption-title'), subtitle: $('caption-subtitle'), tagline: $('caption-tagline') }, state, onChange);
+  bindPosterExtras($('poster-extras'), state, onChange);
 
   $('export-png').addEventListener('click', async () => {
     status.textContent = `Rendering ${state.size.w} × ${state.size.h}…`;

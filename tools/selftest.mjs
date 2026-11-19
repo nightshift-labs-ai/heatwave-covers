@@ -85,6 +85,25 @@ try {
   await page.waitForTimeout(400);
   check(all.length === 3 && ['1080x1080', '1080x1350', '1920x1080'].every((s) => all.includes(`heatwave-${s}.png`)), `Export all 3 sizes -> ${all.join(', ')}`);
 
+  // Poster extras on Key Art Slash: the Seal toggle is one undo step (undo brings it back, redo removes it again), and
+  // the billing toggle, quote and tag 2 are kept for the next page. The preview must change when a toggle flips.
+  await page.click('#layout-tiles button[data-layout="keyArtSlash"]');
+  await page.waitForTimeout(400);
+  const previewHash = () => page.evaluate(() => { const c = document.querySelector('#cover-preview'); const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let h = 0; for (let i = 0; i < d.length; i += 97) h = (h * 31 + d[i]) >>> 0; return h; });
+  const withSeal = await previewHash();
+  await page.uncheck('#poster-extras input[data-extra="seal"]');
+  await page.waitForTimeout(400);
+  const noSeal = await previewHash();
+  await page.click('#undo-btn');
+  const sealBack = await page.isChecked('#poster-extras input[data-extra="seal"]');
+  await page.click('#redo-btn');
+  const sealGone = !(await page.isChecked('#poster-extras input[data-extra="seal"]'));
+  check(withSeal !== noSeal && sealBack && sealGone, 'Seal toggle redraws the preview and is one undo/redo step');
+  await page.uncheck('#poster-extras input[data-extra="billing"]');
+  await page.fill('#poster-extras input[data-quote]', '"A SLOW BURN" — HARBOR WEEKLY');
+  await page.fill('#poster-extras input[data-tag="1"]', 'SALT FLATS · 6 AM');
+  await page.waitForTimeout(500);
+
   // One photo through the real file input: every panel gets its own crop; keys 5 (Strip Five), G (grade), E (export).
   const one = await context.newPage();
   one.on('pageerror', (e) => errors.push(e.message));
@@ -95,6 +114,11 @@ try {
   const keptTitle = await one.inputValue('#caption-title');
   const keptSize = await one.getAttribute('#size-buttons button.on', 'data-size');
   check(keptTitle === 'TEST TITLE' && keptSize === '1920x1080', `settings restored from localStorage (${keptTitle}, ${keptSize})`);
+  const keptQuote = await one.inputValue('#poster-extras input[data-quote]');
+  const keptTag = await one.inputValue('#poster-extras input[data-tag="1"]');
+  const keptBilling = await one.isChecked('#poster-extras input[data-extra="billing"]');
+  const keptSeal = await one.isChecked('#poster-extras input[data-extra="seal"]');
+  check(/SLOW BURN/.test(keptQuote) && keptTag === 'SALT FLATS · 6 AM' && !keptBilling && !keptSeal, `poster extras restored from localStorage (${keptQuote} / ${keptTag} / billing ${keptBilling} / seal ${keptSeal})`);
   const gradeBefore = await one.getAttribute('#grade-swatches button.on', 'data-grade');
   await one.keyboard.press('6');
   await one.keyboard.press('g');

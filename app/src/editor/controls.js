@@ -58,6 +58,30 @@ export function bindCaptionFields(fields, state, onChange) {
   }
 }
 
+// Poster extras (key-art layout): five toggles (data-extra) and the quote / panel-tag fields (data-quote, data-tag).
+// A toggle is one undo step; typing goes through 'caption', so a burst of keystrokes is one step too.
+export function bindPosterExtras(root, state, onChange) {
+  root.querySelectorAll('input[data-extra]').forEach((box) => {
+    box.addEventListener('change', () => { state.dressing = { ...state.dressing, [box.dataset.extra]: box.checked }; onChange('extras'); });
+  });
+  const quote = root.querySelector('input[data-quote]');
+  quote.addEventListener('input', () => { state.caption.quote = quote.value; onChange('caption'); });
+  root.querySelectorAll('input[data-tag]').forEach((f) => {
+    f.addEventListener('input', () => {
+      const tags = [...(state.caption.tags ?? ['', '', ''])];
+      tags[+f.dataset.tag] = f.value;
+      state.caption.tags = tags;
+      onChange('caption');
+    });
+  });
+}
+
+export function syncPosterExtras(root, state) {
+  root.querySelectorAll('input[data-extra]').forEach((box) => { box.checked = state.dressing?.[box.dataset.extra] !== false; });
+  root.querySelector('input[data-quote]').value = state.caption.quote ?? '';
+  root.querySelectorAll('input[data-tag]').forEach((f) => { f.value = state.caption.tags?.[+f.dataset.tag] ?? ''; });
+}
+
 export function buildSizeButtons(root, state, onChange) {
   root.textContent = '';
   for (const s of COVER_SIZES) {
