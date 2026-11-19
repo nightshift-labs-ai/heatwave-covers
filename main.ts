@@ -5,9 +5,10 @@
 // This program hands the app in: it copies app/ and screenshots/ to /output and writes /output/dossier.json with the
 // vendored make.fun library. The logic below is the kit starter's, unchanged and deterministic (same input bytes,
 // same dossier bytes).
-// Screenshots (M5): 1-cover-1920.jpg (Key Art Slash, Sunset Strip, no Poster Ink: crisp photo grade with deep
-// shadows, Sky glow on, a rooftop hero in sunglasses looking out of frame under a sunset sky, a neon marina and a
-// neon close-up for cool contrast, six distinct photos, title over the art), 2-editor.jpg (the editor with Key Art Slash, the Poster extras toggles and tag fields,
+// Screenshots (M7): 1-cover-1920.jpg (Key Art Slash Plus, Sunset Strip, no Poster Ink: crisp photo grade with deep
+// shadows, Sky glow on, a rooftop hero in sunglasses looking out of frame under a sunset sky, a speedboat by the
+// towers in a new top-middle panel, a neon marina and a neon close-up for cool contrast, the moto, seven distinct
+// photos, title over the art), 2-editor.jpg (the editor with Key Art Slash, the Poster extras toggles and tag fields,
 // undo/redo), 3-cover-1080x1350.jpg (Key Art Slash, Neon Night, six photos), 4-cover-1080.jpg (Key Art Slash from
 // ONE photo in five crops, Golden Hour); exports 1080x1080, 1080x1350, 1920x1080 PNG.
 //

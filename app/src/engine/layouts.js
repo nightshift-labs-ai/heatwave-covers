@@ -155,6 +155,22 @@ export const LAYOUTS = {
   },
 };
 
+// Key Art Slash Plus (shot 1 only; not in the picker): Key Art Slash with a seventh slanted panel cut from the hero's
+// empty sky at top-middle, between the hero and the big top-right panel, clear of the title, quote, seal and pill.
+// The hero keeps the same bounding box (same crop), so the hero stays the biggest image; panels 1-5 are unchanged.
+LAYOUTS.keyArtSlashPlus = {
+  ...LAYOUTS.keyArtSlash,
+  label: 'Key Art Slash Plus',
+  land: {
+    ...LAYOUTS.keyArtSlash.land,
+    polys: [
+      [[0, 0], [0.47, 0], [0.452, 0.405], [0.581, 0.42], [0.555, 1], [0, 1]],
+      ...LAYOUTS.keyArtSlash.land.polys.slice(1),
+      [[0.47, 0], [0.6, 0], [0.581, 0.42], [0.452, 0.405]],
+    ],
+  },
+};
+
 export const LAYOUT_ORDER = ['keyArtSlash', 'keyArtNine','heroAndSix', 'heroFour', 'tiltedSnapshots', 'stripFive', 'gridFour', 'fullBleedInset'];
 
 export const COVER_SIZES = [
