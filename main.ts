@@ -5,9 +5,10 @@
 // This program hands the app in: it copies app/ and screenshots/ to /output and writes /output/dossier.json with the
 // vendored make.fun library. The logic below is the kit starter's, unchanged and deterministic (same input bytes,
 // same dossier bytes).
-// Screenshots (M3a): 1-cover-1920.jpg (Key Art Slash, Sunset Strip, painterly Poster Ink, six distinct photos,
-// title over the art), 2-editor.jpg (the editor with Hero + Four, undo/redo), 3-cover-1080x1350.jpg (Snapshots,
-// Neon Night), 4-cover-1080.jpg (Grid Four from one photo, Miami Teal); exports 1080x1080, 1080x1350, 1920x1080 PNG.
+// Screenshots (M3b): 1-cover-1920.jpg (Key Art Slash, Sunset Strip, painterly Poster Ink, six distinct photos,
+// title over the art), 2-editor.jpg (the editor with Key Art Slash, the Poster extras toggles and tag fields,
+// undo/redo), 3-cover-1080x1350.jpg (Key Art Slash, Neon Night, six photos), 4-cover-1080.jpg (Key Art Slash from
+// ONE photo in five crops, Golden Hour); exports 1080x1080, 1080x1350, 1920x1080 PNG.
 //
 // Serve it locally with `node serve.ts`, then open http://localhost:8080.
 // Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output:
