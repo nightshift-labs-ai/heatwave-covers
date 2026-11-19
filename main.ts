@@ -4,6 +4,7 @@
 // grade and Poster Ink (posterize + ink lines + halftone), edit the caption, export a PNG. This program hands the app
 // in: it copies app/ and screenshots/ to /output and writes /output/dossier.json with the vendored make.fun library.
 // The logic below is the kit starter's, unchanged and deterministic (same input bytes, same dossier bytes).
+// Screenshots: 1-cover-1920.jpg, 2-editor.jpg, 3-cover-1080x1350.jpg, 4-cover-1080.jpg; exports 1080x1080, 1080x1350, 1920x1080 PNG.
 //
 // Serve it locally with `node serve.ts`, then open http://localhost:8080.
 // Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output:
