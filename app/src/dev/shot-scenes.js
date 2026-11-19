@@ -29,25 +29,25 @@ const SCENES = {
       { photo: 2, zoom: 1, fx: 0.5, fy: 0.4 }, { photo: 3, zoom: 1.1, fx: 0.5, fy: 0.35 }, { photo: 4, zoom: 1, fx: 0.5, fy: 0.3 },
     ],
   },
-  // Shot 4: 1080 x 1080 from ONE photo, five smart crops in Strip Five, Golden Hour.
+  // Shot 4: 1080 x 1080 from ONE photo, four crops in Grid Four (face, ferris wheel, arcade, shirt), Miami Teal.
   'cover-one': {
-    layoutId: 'stripFive', gradeId: 'goldenHour', size: [1080, 1080],
-    caption: { title: 'GOLDEN HOUR', subtitle: 'One Photo, Five Shots', tagline: 'FIVE CROPS · ONE SNAPSHOT' },
-    photos: ['woman-palms'],
+    layoutId: 'gridFour', gradeId: 'miamiTeal', size: [1080, 1080],
+    caption: { title: 'BOARDWALK', subtitle: 'One Photo, Four Shots', tagline: 'FOUR CROPS · ONE SNAPSHOT' },
+    photos: ['flamingo-boardwalk'],
     panels: [
-      { photo: 0, zoom: 1, fx: 0.1, fy: 0.5 }, { photo: 0, zoom: 1.3, fx: 0.36, fy: 0.32 }, { photo: 0, zoom: 1.0, fx: 0.47, fy: 0.3 },
-      { photo: 0, zoom: 2.2, fx: 0.5, fy: 0.32 }, { photo: 0, zoom: 1, fx: 0.9, fy: 0.5 },
+      { photo: 0, zoom: 1.6, fx: 0.56, fy: 0.24 }, { photo: 0, zoom: 1.7, fx: 0.86, fy: 0.32 },
+      { photo: 0, zoom: 1.5, fx: 0.12, fy: 0.5 }, { photo: 0, zoom: 2.3, fx: 0.47, fy: 0.62 },
     ],
   },
   // Shot 2: the editor with photos in the tray, Hero + Four (supercar hero, four framed photos), Poster Ink on,
   // one framed panel selected, step 3 lit.
   editor: {
-    layoutId: 'heroFour', gradeId: 'sunsetStrip', size: [1920, 1080], selected: 2, editor: true,
+    layoutId: 'heroFour', gradeId: 'sunsetStrip', size: [1920, 1080], selected: 0, editor: true,
     caption: { title: 'SALT & SIRENS', subtitle: 'Harbor Run', tagline: 'EVERY STREET HAS A PRICE' },
     photos: ['supercar-boulevard', 'woman-palms', 'pier-fisher', 'couple-pier', 'lady-motel', 'coupe-desert', 'speedboat', 'moto-causeway'],
     panels: [
-      { photo: 0, zoom: 1.05, fx: 0.48, fy: 0.5 }, { photo: 1, zoom: 1.1, fx: 0.5, fy: 0.3 }, { photo: 2, zoom: 1.1, fx: 0.42, fy: 0.4 },
-      { photo: 3, zoom: 1, fx: 0.5, fy: 0.38 }, { photo: 4, zoom: 1.1, fx: 0.5, fy: 0.3 },
+      { photo: 0, zoom: 1.05, fx: 0.5, fy: 0.55 }, { photo: 1, zoom: 1.15, fx: 0.5, fy: 0.3 }, { photo: 2, zoom: 1.35, fx: 0.33, fy: 0.36 },
+      { photo: 3, zoom: 1.1, fx: 0.5, fy: 0.35 }, { photo: 4, zoom: 1.7, fx: 0.6, fy: 0.24 },
     ],
   },
 };
