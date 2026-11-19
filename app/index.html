@@ -3,20 +3,66 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cover Snap</title>
-<link rel="stylesheet" href="./style.css">
+<title>HEATWAVE Cover Studio</title>
+<style>
+@font-face { font-family: 'Anton'; src: url('./fonts/anton/anton-latin-400-normal.woff2') format('woff2'); font-weight: 400; font-display: block; }
+@font-face { font-family: 'Oswald'; src: url('./fonts/oswald/oswald-latin-500-normal.woff2') format('woff2'); font-weight: 500; font-display: block; }
+@font-face { font-family: 'Oswald'; src: url('./fonts/oswald/oswald-latin-700-normal.woff2') format('woff2'); font-weight: 700; font-display: block; }
+@font-face { font-family: 'Kaushan Script'; src: url('./fonts/kaushan-script/kaushan-script-latin-400-normal.woff2') format('woff2'); font-weight: 400; font-display: block; }
+@font-face { font-family: 'Teko'; src: url('./fonts/teko/teko-latin-500-normal.woff2') format('woff2'); font-weight: 500; font-display: block; }
+@font-face { font-family: 'Teko'; src: url('./fonts/teko/teko-latin-600-normal.woff2') format('woff2'); font-weight: 600; font-display: block; }
+</style>
+<link rel="stylesheet" href="./styles/editor.css">
 </head>
 <body>
-<main class="app">
-  <section class="controls">
-    <h1>Cover Snap</h1>
-    <p>A photo and a caption, made into a square cover.</p>
-    <label>Photo <input id="photo" type="file" accept="image/*"></label>
-    <label>Caption <input id="caption" type="text" maxlength="40" value="Sunset Heist"></label>
-    <button id="export" type="button">Export PNG 1080 x 1080</button>
-    <p id="status" role="status"></p>
+<header class="studio-header">
+  <div class="wordmark"><span class="wm-heat">HEAT</span><span class="wm-wave">WAVE</span><small>Cover Studio</small></div>
+  <p class="tagline">Your photos as a sunset crime-epic poster. Three steps, one PNG.</p>
+  <ol class="step-strip">
+    <li data-step="1"><b>1</b> Add photos</li>
+    <li data-step="2"><b>2</b> Pick a layout</li>
+    <li data-step="3"><b>3</b> Export</li>
+  </ol>
+</header>
+<main class="studio">
+  <aside class="rail rail-left card">
+    <h2>Photos</h2>
+    <label class="btn btn-add">Add photos<input id="photo-input" type="file" accept="image/*" multiple hidden></label>
+    <button class="btn btn-ghost btn-samples" type="button">Load samples</button>
+    <button class="btn btn-ghost btn-autofill" type="button">Auto-fill panels</button>
+    <div id="drop-zone" class="drop-zone">Drop photos here<br><small>never uploaded</small></div>
+    <div id="photo-tray" class="photo-tray"></div>
+  </aside>
+  <section class="stage">
+    <div class="preview-wrap card">
+      <canvas id="cover-preview" width="960" height="540" aria-label="Live cover preview"></canvas>
+      <div class="drag-pill" hidden>Drag to move · Scroll to zoom</div>
+    </div>
+    <div class="zoom-row card">
+      <span class="lbl">Panel zoom</span>
+      <button class="btn btn-mini zoom-out" type="button">−</button>
+      <input id="crop-zoom" type="range" min="1" max="3" step="0.01" value="1">
+      <button class="btn btn-mini zoom-in" type="button">+</button>
+      <button class="btn btn-mini reset-crop" type="button">Reset crop</button>
+    </div>
   </section>
-  <canvas id="cover" width="1080" height="1080" aria-label="The cover"></canvas>
+  <aside class="rail rail-right card">
+    <h2>Layout</h2>
+    <div id="layout-tiles" class="layout-tiles"></div>
+    <h2>Grade</h2>
+    <div id="grade-swatches" class="grade-swatches"></div>
+    <h2>Poster Ink</h2>
+    <div class="ink-row"><label class="switch"><input id="ink-toggle" type="checkbox" checked> Ink on</label>
+      <input class="ink-strength" type="range" min="0" max="1" step="0.05" value="0.8" aria-label="Ink strength"></div>
+    <h2>Caption</h2>
+    <input id="caption-title" class="field" type="text" maxlength="24" value="HEATWAVE" aria-label="Title">
+    <input id="caption-subtitle" class="field" type="text" maxlength="32" value="Coastline Nights" aria-label="Subtitle">
+    <input id="caption-tagline" class="field" type="text" maxlength="40" value="IN STORES SOMEWHERE SOON" aria-label="Tagline">
+    <h2>Size</h2>
+    <div id="size-buttons" class="size-buttons"></div>
+    <button id="export-png" class="btn btn-export" type="button">Export PNG</button>
+    <p id="export-status" class="status" role="status">Add photos to start.</p>
+  </aside>
 </main>
 <script type="module" src="./src/main.js"></script>
 </body>

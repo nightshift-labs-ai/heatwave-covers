@@ -1,0 +1,65 @@
+/* HEATWAVE Cover Studio editor: dark navy UI, hot pink / sunset orange / teal accents, 10 px cards, Teko labels. */
+:root {
+  --navy: #0d1024; --navy-2: #151a36; --navy-3: #1f2547; --ink: #e9ecff; --dim: #8d93bd;
+  --pink: #ff2e88; --orange: #ff8a3d; --gold: #ffd23f; --teal: #19e3d0;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--navy); color: var(--ink); font: 14px/1.35 'Oswald', system-ui, sans-serif; }
+body { display: flex; flex-direction: column; min-height: 100vh; }
+.card { background: var(--navy-2); border: 1px solid var(--navy-3); border-radius: 10px; }
+h2 { font: 600 20px/1 'Teko', sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--teal); margin: 10px 0 6px; }
+
+.studio-header { display: flex; align-items: center; gap: 18px; padding: 10px 18px; background: linear-gradient(90deg, #14072a, #0d1024 55%, #071a2a); border-bottom: 2px solid var(--pink); }
+.wordmark { font: 400 34px/1 'Anton', sans-serif; letter-spacing: .02em; display: flex; align-items: baseline; gap: 2px; }
+.wm-heat { background: linear-gradient(180deg, var(--gold), var(--orange) 55%, var(--pink)); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-stroke: 1px #1a0b2e; }
+.wm-wave { color: var(--teal); text-shadow: 0 0 12px rgba(25, 227, 208, .6); }
+.wordmark small { font: 500 18px 'Teko', sans-serif; color: var(--dim); margin-left: 8px; letter-spacing: .1em; text-transform: uppercase; }
+.tagline { margin: 0; color: var(--dim); font-size: 13px; flex: 1; }
+.step-strip { display: flex; gap: 6px; list-style: none; margin: 0; padding: 0; }
+.step-strip li { font: 500 19px/1 'Teko', sans-serif; letter-spacing: .05em; padding: 7px 12px 5px; border-radius: 999px; background: var(--navy-3); color: var(--dim); }
+.step-strip li b { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: #2b3260; margin-right: 4px; font-weight: 600; }
+.step-strip li.done { color: var(--ink); }
+.step-strip li.done b { background: var(--teal); color: #04121a; }
+.step-strip li.active { background: var(--pink); color: #fff; box-shadow: 0 0 14px rgba(255, 46, 136, .55); }
+.step-strip li.active b { background: #fff; color: var(--pink); }
+
+.studio { flex: 1; display: grid; grid-template-columns: 200px minmax(0, 1fr) 250px; gap: 12px; padding: 12px; min-height: 0; }
+.rail { padding: 6px 12px 12px; overflow: auto; }
+.btn { display: block; width: 100%; border: 0; border-radius: 10px; padding: 8px 10px; margin: 6px 0; font: 600 18px/1 'Teko', sans-serif; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; text-align: center; color: #fff; background: var(--navy-3); }
+.btn-add { background: linear-gradient(90deg, var(--orange), var(--pink)); }
+.btn-ghost { background: transparent; border: 1px solid #343c6e; color: var(--ink); }
+.btn-mini { display: inline-block; width: auto; margin: 0; padding: 6px 10px; font-size: 16px; }
+.btn-export { margin-top: 12px; padding: 13px; font-size: 24px; background: var(--pink); box-shadow: 0 6px 22px rgba(255, 46, 136, .45); }
+.btn-export:hover, .btn-add:hover { filter: brightness(1.1); }
+.drop-zone { border: 2px dashed #3a4278; border-radius: 10px; padding: 10px; text-align: center; color: var(--dim); font-size: 12px; margin: 8px 0; }
+.drop-zone.over { border-color: var(--teal); color: var(--teal); }
+.photo-tray { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.photo-tray img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 6px; border: 2px solid transparent; display: block; }
+.photo-tray img.used { border-color: var(--teal); }
+
+.stage { display: flex; flex-direction: column; gap: 10px; min-width: 0; min-height: 0; }
+.preview-wrap { position: relative; flex: 1; display: grid; place-items: center; padding: 10px; min-height: 0; background: repeating-linear-gradient(45deg, #10142c 0 12px, #12173a 12px 24px); }
+#cover-preview { max-width: 100%; max-height: 100%; box-shadow: 0 10px 40px rgba(0, 0, 0, .6); cursor: grab; touch-action: none; }
+#cover-preview.dragging { cursor: grabbing; }
+.drag-pill { position: absolute; pointer-events: none; font: 500 16px/1 'Teko', sans-serif; letter-spacing: .05em; padding: 6px 12px 4px; border-radius: 999px; background: rgba(13, 16, 36, .85); color: #fff; border: 1px solid var(--pink); transform: translate(-50%, -50%); }
+.zoom-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; }
+.zoom-row .lbl { font: 600 18px 'Teko', sans-serif; color: var(--teal); letter-spacing: .06em; text-transform: uppercase; }
+#crop-zoom { flex: 1; accent-color: var(--pink); }
+
+.layout-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.layout-tiles button { padding: 3px; border-radius: 8px; border: 2px solid #2b3260; background: #0b0b12; cursor: pointer; }
+.layout-tiles button.on { border-color: var(--pink); box-shadow: 0 0 10px rgba(255, 46, 136, .5); }
+.layout-tiles canvas { display: block; width: 100%; height: auto; }
+.grade-swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.grade-swatches button { height: 34px; border-radius: 8px; border: 2px solid transparent; cursor: pointer; font: 500 13px/1 'Teko', sans-serif; color: #fff; text-shadow: 0 1px 2px #000; padding: 0; }
+.grade-swatches button.on { border-color: #fff; box-shadow: 0 0 10px rgba(255, 255, 255, .45); }
+.ink-row { display: flex; align-items: center; gap: 10px; }
+.switch { white-space: nowrap; font: 500 17px 'Teko', sans-serif; }
+.switch input { accent-color: var(--pink); }
+.ink-strength { flex: 1; accent-color: var(--orange); }
+.field { width: 100%; margin: 3px 0; padding: 7px 9px; border-radius: 8px; border: 1px solid #343c6e; background: #0b0e20; color: var(--ink); font: 500 14px 'Oswald', sans-serif; }
+.field:focus { outline: 2px solid var(--pink); }
+.size-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.size-buttons button { padding: 6px 2px 4px; border-radius: 8px; border: 2px solid #2b3260; background: var(--navy-3); color: var(--ink); font: 500 15px/1.05 'Teko', sans-serif; cursor: pointer; }
+.size-buttons button.on { border-color: var(--orange); background: #3a2238; color: #fff; }
+.status { color: var(--dim); font-size: 12px; min-height: 2.4em; margin: 6px 0 0; }
