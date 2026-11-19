@@ -84,6 +84,10 @@ try {
   await one.goto(`${base}index.html`);
   await one.setInputFiles('#photo-input', 'app/samples/woman-palms.jpg');
   await one.waitForFunction(() => document.querySelectorAll('#photo-tray img').length === 1);
+  // localStorage: the first page's caption, grade and size come back on the second page.
+  const keptTitle = await one.inputValue('#caption-title');
+  const keptSize = await one.getAttribute('#size-buttons button.on', 'data-size');
+  check(keptTitle === 'TEST TITLE' && keptSize === '1920x1080', `settings restored from localStorage (${keptTitle}, ${keptSize})`);
   const gradeBefore = await one.getAttribute('#grade-swatches button.on', 'data-grade');
   await one.keyboard.press('5');
   await one.keyboard.press('g');

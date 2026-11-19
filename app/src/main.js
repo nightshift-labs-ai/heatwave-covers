@@ -8,9 +8,11 @@ import {
   buildSizeButtons, syncSizeButtons, renderPhotoTray,
 } from './editor/controls.js';
 import { renderCover, exportCoverPng, ensureCoverAssets } from './engine/render.js';
-import { createStudioState, pushHistory, pushSnapshot, snapshotState, undo, redo } from './state.js';
-import { LAYOUT_ORDER, COVER_SIZES } from './engine/layouts.js';
-import { GRADE_ORDER } from './engine/grades.js';
+import {
+  createStudioState, pushHistory, pushSnapshot, snapshotState, undo, redo, saveStudioSettings, loadStudioSettings,
+} from './state.js';
+import { LAYOUTS, LAYOUT_ORDER, COVER_SIZES } from './engine/layouts.js';
+import { GRADES, GRADE_ORDER } from './engine/grades.js';
 
 const SAMPLE_PHOTOS = [
   'supercar-boulevard', 'woman-palms', 'lady-motel', 'man-neon', 'motel-rain', 'flamingo-boardwalk', 'pier-fisher',
@@ -20,6 +22,10 @@ const SAMPLE_PHOTOS = [
 export async function bootHeatwaveStudio() {
   const state = createStudioState();
   const $ = (id) => document.getElementById(id);
+  // Screenshot scenes (?shot=) start from the defaults and never write settings, so shots stay reproducible.
+  const shotMode = new URLSearchParams(location.search).has('shot');
+  const restored = !shotMode && loadStudioSettings(state, { layouts: LAYOUTS, grades: GRADES, sizes: COVER_SIZES });
+  let saveTimer = 0;
   const canvas = $('cover-preview');
   const status = $('export-status');
   const pill = document.querySelector('.drag-pill');
@@ -41,6 +47,7 @@ export async function bootHeatwaveStudio() {
     syncSteps();
     if (!fast) settled = snapshotState(state);
     syncHistoryButtons();
+    if (!fast && !shotMode) { clearTimeout(saveTimer); saveTimer = setTimeout(() => saveStudioSettings(state), 300); }
   }
   function syncHistoryButtons() {
     $('undo-btn').disabled = !state.history.length;
@@ -238,6 +245,7 @@ export async function bootHeatwaveStudio() {
   await ensureCoverAssets(state);
   syncControls();
   refresh();
+  if (restored) status.textContent = 'Layout, grade, caption and size restored from your last visit. Photos are never saved: add them again.';
   const shot = new URLSearchParams(location.search).get('shot');
   if (shot) {
     const { runShotScene } = await import('./dev/shot-scenes.js');

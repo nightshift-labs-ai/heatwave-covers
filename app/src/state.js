@@ -49,6 +49,28 @@ export function redo(state) {
   return true;
 }
 
+// Settings kept in localStorage between visits: layout, grade, Poster Ink, caption and size. Photos stay on the
+// person's device and are never stored (they can be large; the status line says so).
+const SETTINGS_KEY = 'heatwave-cover-studio/settings-v1';
+
+export function saveStudioSettings(state) {
+  const { layoutId, gradeId, ink, caption, size } = state;
+  try { localStorage.setItem(SETTINGS_KEY, JSON.stringify({ layoutId, gradeId, ink, caption, size })); return true; } catch { return false; }
+}
+
+// Restores what is valid (known layout and grade ids, one of the export sizes) and ignores the rest.
+export function loadStudioSettings(state, { layouts, grades, sizes }) {
+  let saved;
+  try { saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? 'null'); } catch { saved = null; }
+  if (!saved || typeof saved !== 'object') return false;
+  if (layouts[saved.layoutId]) state.layoutId = saved.layoutId;
+  if (grades[saved.gradeId]) state.gradeId = saved.gradeId;
+  if (saved.ink && typeof saved.ink.on === 'boolean') state.ink = { on: saved.ink.on, strength: Math.max(0, Math.min(1, +saved.ink.strength || 0.8)) };
+  if (saved.caption) for (const k of ['title', 'subtitle', 'tagline']) if (typeof saved.caption[k] === 'string') state.caption[k] = saved.caption[k].slice(0, 40);
+  if (saved.size && sizes.some((s) => s.w === saved.size.w && s.h === saved.size.h)) state.size = { w: saved.size.w, h: saved.size.h };
+  return true;
+}
+
 function snapshot(s) {
   return JSON.stringify({ layoutId: s.layoutId, gradeId: s.gradeId, ink: s.ink, caption: s.caption, size: s.size, panels: s.panels });
 }
