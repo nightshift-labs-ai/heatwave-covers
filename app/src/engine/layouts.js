@@ -75,6 +75,15 @@ export const LAYOUTS = {
       title: [0.04, 0.37, 0.96, 0.62],
     },
   },
+  // Hero + Four: one big hero panel (about 58 % wide) and four framed photos in a 2x2 beside it (thin cream frames,
+  // soft shadow, a small tilt on two of them), title band below. In 4:5 the hero sits on top and the four below it.
+  heroFour: {
+    label: 'Hero + Four',
+    kind: 'heroFour',
+    land: { hero: [0, 0, 0.58, 0.75], frames: [0.58, 0, 1, 0.75], tilts: [-1.6, 0, 0, 1.4], title: [0, 0.75, 1, 1] },
+    square: { hero: [0, 0, 0.58, 0.72], frames: [0.58, 0, 1, 0.72], tilts: [-1.5, 0, 0, 1.6], title: [0, 0.72, 1, 1] },
+    tall: { hero: [0, 0, 1, 0.47], frames: [0, 0.47, 1, 0.79], tilts: [-1.4, 0, 0, 1.2], title: [0, 0.79, 1, 1] },
+  },
   stripFive: {
     label: 'Strip Five',
     kind: 'grid',
@@ -84,7 +93,7 @@ export const LAYOUTS = {
   },
 };
 
-export const LAYOUT_ORDER = ['keyArtNine', 'heroAndSix', 'tiltedSnapshots', 'stripFive'];
+export const LAYOUT_ORDER = ['keyArtNine', 'heroAndSix', 'heroFour', 'tiltedSnapshots', 'stripFive'];
 
 export const COVER_SIZES = [
   { w: 1080, h: 1080, label: '1080 × 1080', sub: 'square' },
@@ -106,6 +115,18 @@ export function layoutFor(layoutId, W, H) {
       return { x: cx * W - pw / 2, y: cy * H - ph / 2, w: pw, h: ph, rot: (rot * Math.PI) / 180, snap: true, border: Math.round(unit * 0.014) };
     });
     return { kind: 'snapshots', panels, title, gutter: g, overlay: true };
+  }
+  if (layout.kind === 'heroFour') {
+    const hero = { ...rectToPixels(spec.hero, W, H, g, g / 2), rot: 0, snap: false };
+    const area = rectToPixels(spec.frames, W, H, g, g / 2);
+    const pad = Math.round(Math.min(W, H) * 0.016), border = Math.max(3, Math.round(Math.min(W, H) * 0.008));
+    const cw = (area.w - pad) / 2, ch = (area.h - pad) / 2;
+    const frames = spec.tilts.map((deg, k) => {
+      const col = k % 2, row = Math.floor(k / 2);
+      const x = area.x + pad / 2 + col * cw, y = area.y + pad / 2 + row * ch;
+      return { x: Math.round(x + pad / 2), y: Math.round(y + pad / 2), w: Math.round(cw - pad), h: Math.round(ch - pad), rot: (deg * Math.PI) / 180, snap: true, frame: true, border };
+    });
+    return { kind: 'grid', framed: area, panels: [hero, ...frames], title: rectToPixels(spec.title, W, H, g, g / 2), gutter: g, overlay: false };
   }
   const panels = spec.panels.map((r) => ({ ...rectToPixels(r, W, H, g, g / 2), rot: 0, snap: false }));
   return { kind: 'grid', panels, title: rectToPixels(spec.title, W, H, g, g / 2), gutter: g, overlay: !!spec.overlay };

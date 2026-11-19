@@ -10,10 +10,12 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 const require = createRequire(`${process.env.PW_NODE_MODULES}/`);
 const { chromium } = require('playwright');
 const base = process.env.SHOOT_BASE ?? 'http://127.0.0.1:8811/';
-const shots = JSON.parse(readFileSync('shots.json', 'utf8'));
+// SHOOT_LIST / SHOOT_DIR: an alternative shot list and output folder (trial shots go to out/ and leave screenshots/ alone).
+const shots = JSON.parse(readFileSync(process.env.SHOOT_LIST ?? 'shots.json', 'utf8'));
+const outDir = process.env.SHOOT_DIR ?? 'screenshots';
 const only = process.argv.slice(2);
 mkdirSync('out', { recursive: true });
-mkdirSync('screenshots', { recursive: true });
+mkdirSync(outDir, { recursive: true });
 
 const browser = await chromium.launch();
 try {
@@ -57,7 +59,7 @@ try {
       const info = await page.evaluate(() => ({ exportMs: window.__lastExport?.ms, renderMs: window.__renderMs }));
       console.log(`${shot.name}: export render ${info.exportMs} ms, scene render ${info.renderMs} ms`);
     }
-    writeFileSync(`screenshots/${shot.name}`, jpeg);
+    writeFileSync(`${outDir}/${shot.name}`, jpeg);
     console.log(`${shot.name}: ${jpeg.length} bytes (${(jpeg.length / 1024).toFixed(1)} KiB)`);
     await context.close();
   }

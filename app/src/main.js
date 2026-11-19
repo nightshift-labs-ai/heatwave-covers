@@ -160,7 +160,7 @@ export async function bootHeatwaveStudio() {
   });
   window.addEventListener('resize', () => refresh());
 
-  const studio = { state, refresh, addSamplePhotos, syncControls };
+  const studio = { state, refresh, addSamplePhotos, syncControls, autoFill: () => autoFillPanels(state) };
   await ensureCoverAssets(state);
   syncControls();
   refresh();

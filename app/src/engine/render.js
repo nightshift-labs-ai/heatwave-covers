@@ -14,6 +14,7 @@ export function renderCover(state, W, H, ctx, opts = {}) {
   ctx.fillStyle = '#0b0b12';
   ctx.fillRect(0, 0, W, H);
   if (geo.kind === 'snapshots') drawSnapshotSky(ctx, W, H, state.gradeId);
+  if (geo.framed) drawFramedBackdrop(ctx, geo.framed, state.gradeId);
   geo.panels.forEach((p, i) => {
     const slot = state.panels[i] ?? { photo: -1, zoom: 1, fx: 0.5, fy: 0.38 };
     const photo = state.photos[slot.photo];
@@ -70,12 +71,13 @@ function drawPanelImage(ctx, p, photo, slot, state, W, i, opts) {
 
 function drawSnapshot(ctx, p, photo, slot, state, W, i, opts) {
   const b = p.border;
-  const iw = Math.max(1, Math.round(p.w - 2 * b)), ih = Math.max(1, Math.round(p.h - b * 3.2));
+  // Snapshots get a polaroid's deep bottom edge; Hero + Four frames are thin and even with a softer, wider shadow.
+  const iw = Math.max(1, Math.round(p.w - 2 * b)), ih = Math.max(1, Math.round(p.h - (p.frame ? 2 * b : b * 3.2)));
   ctx.save();
   ctx.translate(p.x + p.w / 2, p.y + p.h / 2);
   ctx.rotate(p.rot);
-  ctx.shadowColor = 'rgba(10,0,20,0.6)';
-  ctx.shadowBlur = b * 2.4; ctx.shadowOffsetX = b * 0.6; ctx.shadowOffsetY = b;
+  ctx.shadowColor = p.frame ? 'rgba(5,0,15,0.55)' : 'rgba(10,0,20,0.6)';
+  ctx.shadowBlur = b * (p.frame ? 4 : 2.4); ctx.shadowOffsetX = b * 0.6; ctx.shadowOffsetY = b * (p.frame ? 1.6 : 1);
   ctx.fillStyle = '#f6efe0';
   ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
   ctx.shadowColor = 'transparent';
@@ -137,6 +139,31 @@ function drawEmptyPanel(ctx, x, y, w, h, i) {
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText(`+ ${String(i + 1).padStart(2, '0')}`, x + w / 2, y + h / 2);
   ctx.textBaseline = 'alphabetic';
+}
+
+// Backdrop behind the four framed photos of Hero + Four: a dusk gradient tinted by the grade, with faint diagonal rays.
+function drawFramedBackdrop(ctx, a, gradeId) {
+  const css = (t, k) => `rgb(${gradeColorAt(gradeId, t).slice(0, 3).map((v) => Math.round(v * k)).join(',')})`;
+  const g = ctx.createLinearGradient(a.x, a.y, a.x + a.w, a.y + a.h);
+  g.addColorStop(0, css(0.15, 0.7));
+  g.addColorStop(1, css(0.45, 0.75));
+  ctx.save();
+  ctx.fillStyle = g;
+  ctx.fillRect(a.x, a.y, a.w, a.h);
+  ctx.beginPath();
+  ctx.rect(a.x, a.y, a.w, a.h);
+  ctx.clip();
+  ctx.fillStyle = 'rgba(255,220,180,0.06)';
+  const step = Math.max(a.w, a.h) / 9;
+  for (let k = -9; k < 18; k += 2) {
+    ctx.beginPath();
+    ctx.moveTo(a.x + k * step, a.y);
+    ctx.lineTo(a.x + (k + 1) * step, a.y);
+    ctx.lineTo(a.x + (k + 1) * step - a.h, a.y + a.h);
+    ctx.lineTo(a.x + k * step - a.h, a.y + a.h);
+    ctx.fill();
+  }
+  ctx.restore();
 }
 
 // Sky behind tilted snapshots: night-to-sunset gradient, a striped halftone sun and a dark sea with light streaks.

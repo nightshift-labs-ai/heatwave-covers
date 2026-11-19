@@ -37,15 +37,15 @@ const SCENES = {
       { photo: 0, zoom: 2.2, fx: 0.5, fy: 0.32 }, { photo: 0, zoom: 1, fx: 0.9, fy: 0.5 },
     ],
   },
-  // Shot 2: the editor with the samples in the tray, Hero + Six, one panel selected, step 3 lit.
+  // Shot 2: the editor with photos in the tray, Hero + Four (supercar hero, four framed photos), Poster Ink on,
+  // one framed panel selected, step 3 lit.
   editor: {
-    layoutId: 'heroAndSix', gradeId: 'sunsetStrip', size: [1920, 1080], selected: 2, editor: true,
-    caption: { title: 'SALT & SIRENS', subtitle: 'Harbor Run', tagline: 'IN STORES SOMEWHERE SOON' },
-    photos: ['woman-palms', 'lady-motel', 'man-neon', 'pool-neon', 'coupe-desert', 'speedboat', 'moto-causeway', 'couple-pier'],
+    layoutId: 'heroFour', gradeId: 'sunsetStrip', size: [1920, 1080], selected: 2, editor: true,
+    caption: { title: 'SALT & SIRENS', subtitle: 'Harbor Run', tagline: 'EVERY STREET HAS A PRICE' },
+    photos: ['supercar-boulevard', 'woman-palms', 'pier-fisher', 'couple-pier', 'lady-motel', 'coupe-desert', 'speedboat', 'moto-causeway'],
     panels: [
-      { photo: 1, zoom: 1, fx: 0.5, fy: 0.3 }, { photo: 0, zoom: 1, fx: 0.5, fy: 0.3 }, { photo: 2, zoom: 1.2, fx: 0.5, fy: 0.35 },
-      { photo: 3, zoom: 1, fx: 0.5, fy: 0.4 }, { photo: 5, zoom: 1, fx: 0.5, fy: 0.4 }, { photo: 6, zoom: 1, fx: 0.5, fy: 0.4 },
-      { photo: 7, zoom: 1, fx: 0.5, fy: 0.38 },
+      { photo: 0, zoom: 1.05, fx: 0.48, fy: 0.5 }, { photo: 1, zoom: 1.1, fx: 0.5, fy: 0.3 }, { photo: 2, zoom: 1.1, fx: 0.42, fy: 0.4 },
+      { photo: 3, zoom: 1, fx: 0.5, fy: 0.38 }, { photo: 4, zoom: 1.1, fx: 0.5, fy: 0.3 },
     ],
   },
 };
@@ -59,7 +59,12 @@ export async function runShotScene(name, studio) {
   state.ink = { on: true, strength: 0.8 };
   state.caption = { ...scene.caption };
   state.size = { w: scene.size[0], h: scene.size[1] };
+  // Trial renders: &layout=<id>&grade=<id>&size=WxH override the scene (crops are re-filled if the layout changes).
+  const q = new URLSearchParams(location.search);
+  if (q.get('size')) { const [w, h] = q.get('size').split('x').map(Number); state.size = { w, h }; }
+  if (q.get('grade')) state.gradeId = q.get('grade');
   state.panels = scene.panels.map((p) => ({ ...p }));
+  if (q.get('layout')) { state.layoutId = q.get('layout'); studio.autoFill(); }
   state.selected = scene.selected ?? -1;
   state.step = 3;
   await ensureCoverAssets(state);
