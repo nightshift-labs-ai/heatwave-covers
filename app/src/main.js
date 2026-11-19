@@ -235,7 +235,7 @@ export async function bootHeatwaveStudio() {
   // Undo / redo: buttons under the preview, Ctrl+Z, Ctrl+Y or Ctrl+Shift+Z.
   $('undo-btn').addEventListener('click', () => stepHistory(true));
   $('redo-btn').addEventListener('click', () => stepHistory(false));
-  // Keyboard: outside text fields 1-7 pick a layout, G cycles the grade, E exports, ? shows the list.
+  // Keyboard: outside text fields 1-8 pick a layout (1 = Key Art Slash), G cycles the grade, E exports, ? shows the list.
   document.addEventListener('keydown', (e) => {
     const key = e.key.toLowerCase();
     if ((e.ctrlKey || e.metaKey) && (key === 'z' || key === 'y')) {

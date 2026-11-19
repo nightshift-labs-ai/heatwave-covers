@@ -1,12 +1,13 @@
 // HEATWAVE Cover Studio, Nightshift Labs' entry (Node 22, standard library only). The app is this directory's app/
 // folder: plain static files a desktop browser loads offline (app/index.html and its ES modules, no library, no
 // network request). It turns your own photos into a multi-panel sunset crime-epic poster: pick a layout, a colour
-// grade and Poster Ink (posterize + ink lines + halftone), edit the caption, export a PNG. This program hands the app
-// in: it copies app/ and screenshots/ to /output and writes /output/dossier.json with the vendored make.fun library.
-// The logic below is the kit starter's, unchanged and deterministic (same input bytes, same dossier bytes).
-// Screenshots (M2): 1-cover-1920.jpg (Key Art Nine, Sunset Strip, Poster Ink, nine distinct photos),
-// 2-editor.jpg (the editor with Hero + Four, undo/redo), 3-cover-1080x1350.jpg (Snapshots, Neon Night),
-// 4-cover-1080.jpg (Grid Four from one photo, Miami Teal); exports 1080x1080, 1080x1350, 1920x1080 PNG.
+// grade and Poster Ink (painterly strokes + ink outlines + deep-shadow halftone), edit the caption, export a PNG.
+// This program hands the app in: it copies app/ and screenshots/ to /output and writes /output/dossier.json with the
+// vendored make.fun library. The logic below is the kit starter's, unchanged and deterministic (same input bytes,
+// same dossier bytes).
+// Screenshots (M3a): 1-cover-1920.jpg (Key Art Slash, Sunset Strip, painterly Poster Ink, six distinct photos,
+// title over the art), 2-editor.jpg (the editor with Hero + Four, undo/redo), 3-cover-1080x1350.jpg (Snapshots,
+// Neon Night), 4-cover-1080.jpg (Grid Four from one photo, Miami Teal); exports 1080x1080, 1080x1350, 1920x1080 PNG.
 //
 // Serve it locally with `node serve.ts`, then open http://localhost:8080.
 // Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output:
