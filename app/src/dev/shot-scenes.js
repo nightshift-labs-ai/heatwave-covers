@@ -2,6 +2,7 @@
 // and crops by hand, waits for fonts and decoded photos, renders once, then sets window.__shotReady = true.
 
 import { ensureCoverAssets, renderCover } from '../engine/render.js';
+import { pushHistory } from '../state.js';
 
 const SCENES = {
   // Shot 1: 1920 x 1080, Key Art Nine, Sunset Strip, Poster Ink on, eight distinct photos.
@@ -55,6 +56,7 @@ export async function runShotScene(name, studio) {
   const scene = SCENES[name] ?? SCENES['cover-keyart'];
   const { state } = studio;
   await studio.addSamplePhotos(scene.photos);
+  pushHistory(state); // setting up the scene is an edit like any other: Undo is live in the editor shot
   state.layoutId = scene.layoutId;
   state.gradeId = scene.gradeId;
   state.ink = { on: true, strength: 0.8 };

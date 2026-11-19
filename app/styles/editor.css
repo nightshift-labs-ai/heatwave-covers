@@ -38,6 +38,12 @@ h2 { font: 600 20px/1 'Teko', sans-serif; letter-spacing: .06em; text-transform:
 .keys-pop dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 0; font-size: 13px; }
 .keys-pop dt { font: 600 15px 'Teko', sans-serif; color: #ffd23f; white-space: nowrap; }
 .keys-pop dd { margin: 0; color: var(--ink); }
+.panel-menu { position: absolute; z-index: 15; width: 196px; padding: 8px 10px 10px; display: grid; gap: 6px; border-color: var(--pink); box-shadow: 0 12px 30px rgba(0, 0, 0, .6); }
+.panel-menu h3 { margin: 0; font: 600 18px 'Teko', sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--teal); }
+.panel-menu-photos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.panel-menu-photos button { aspect-ratio: 1; border: 2px solid transparent; border-radius: 6px; background: #222 center / cover; cursor: pointer; padding: 0; }
+.panel-menu-photos button.on, .panel-menu-photos button:hover { border-color: var(--pink); }
+.panel-menu-item { width: 100%; }
 .btn-export-all { margin-top: 6px; padding: 6px; font-size: 17px; }
 .drop-zone { border: 2px dashed #3a4278; border-radius: 10px; padding: 10px; text-align: center; color: var(--dim); font-size: 12px; margin: 8px 0; }
 .drop-zone.over { border-color: var(--teal); color: var(--teal); }
@@ -49,7 +55,7 @@ h2 { font: 600 20px/1 'Teko', sans-serif; letter-spacing: .06em; text-transform:
 .preview-wrap { position: relative; flex: 1; display: grid; place-items: center; padding: 6px; min-height: 0; background: repeating-linear-gradient(45deg, #10142c 0 12px, #12173a 12px 24px); }
 #cover-preview { max-width: 100%; max-height: 100%; box-shadow: 0 10px 40px rgba(0, 0, 0, .6); cursor: grab; touch-action: none; }
 #cover-preview.dragging { cursor: grabbing; }
-.drag-pill { position: absolute; pointer-events: none; font: 500 16px/1 'Teko', sans-serif; letter-spacing: .05em; padding: 6px 12px 4px; border-radius: 999px; background: rgba(13, 16, 36, .85); color: #fff; border: 1px solid var(--pink); transform: translate(-50%, -50%); }
+.drag-pill { position: absolute; pointer-events: none; font: 500 16px/1 'Teko', sans-serif; letter-spacing: .05em; padding: 6px 12px 4px; border-radius: 999px; background: rgba(13, 16, 36, .85); color: #fff; border: 1px solid var(--pink); transform: translate(-50%, -50%); white-space: nowrap; }
 .zoom-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; }
 .zoom-row .history-btns { margin-left: auto; display: flex; gap: 6px; }
 .zoom-row .history-btns .btn:disabled { opacity: .4; cursor: default; }

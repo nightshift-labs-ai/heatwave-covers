@@ -58,6 +58,13 @@ try {
     await new Promise((res) => setTimeout(res, 600));
     return document.getElementById('export-status').textContent;
   });
+  // Right-click a panel: the panel menu opens; picking a photo puts it in that panel and closes the menu.
+  const cb = await page.locator('#cover-preview').boundingBox();
+  await page.mouse.click(cb.x + cb.width * 0.15, cb.y + cb.height * 0.3, { button: 'right' });
+  const menuOpen = await page.isVisible('.panel-menu');
+  await page.click('.panel-menu-photos button:nth-child(3)');
+  const picked = await page.evaluate(() => document.querySelector('.panel-menu') === null);
+  check(menuOpen && picked, 'right-click opens the panel menu and a photo pick closes it');
   const trayAfter = await page.locator('#photo-tray img').count();
   check(trayAfter === trayBefore + 2 && /in the tray/.test(dropped), `drop on a panel + paste add 2 photos (${trayBefore} -> ${trayAfter}; "${dropped}")`);
   for (const size of ['1080x1080', '1080x1350', '1920x1080']) {

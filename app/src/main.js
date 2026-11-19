@@ -3,6 +3,7 @@
 import { loadPhotoFiles, loadPhotoUrl, autoFillPanels } from './photos.js';
 import { bindPreviewPointer, drawSelectionOverlay, zoomPanel, hitTestPanel } from './editor/panels.js';
 import { bindTitleDoubleClickEdit } from './editor/title-edit.js';
+import { bindPanelMenu } from './editor/panel-menu.js';
 import {
   buildLayoutTiles, syncLayoutTiles, buildGradeSwatches, syncGradeSwatches, bindInkControls, bindCaptionFields,
   buildSizeButtons, syncSizeButtons, renderPhotoTray,
@@ -172,6 +173,8 @@ export async function bootHeatwaveStudio() {
   });
   document.querySelector('.btn-autofill').addEventListener('click', () => { pushHistory(state); autoFillPanels(state); syncControls(); refresh(); });
 
+  // Right-click a panel: its menu (pick the photo, reset crop, clear).
+  bindPanelMenu(canvas, state, { commit: () => pushHistory(state), changed: () => { syncControls(); refresh(); } });
   // Double-click the title on the preview: edit it in place (one undo step).
   bindTitleDoubleClickEdit(canvas, state, {
     commit: (title) => {
