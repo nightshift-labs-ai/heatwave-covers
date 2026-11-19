@@ -1,5 +1,6 @@
 [
-  { "name": "1-cover.jpg", "query": "?shot=cover&photo=pier&caption=Sunset%20Heist", "w": 1080, "h": 1080 },
-  { "name": "2-editor.jpg", "query": "?shot=editor&photo=boulevard&caption=Boulevard%20Queen", "w": 1280, "h": 720 },
-  { "name": "3-cover.jpg", "query": "?shot=cover&photo=boulevard&caption=Boulevard%20Queen", "w": 1080, "h": 1080 }
+  { "name": "1-cover-1920.jpg", "query": "?shot=cover-keyart", "kind": "export", "w": 1280, "h": 720, "budget": 235520 },
+  { "name": "2-editor.jpg", "query": "?shot=editor", "kind": "page", "w": 1280, "h": 800, "budget": 174080 },
+  { "name": "3-cover-1080x1350.jpg", "query": "?shot=cover-tall", "kind": "export", "w": 864, "h": 1080, "budget": 174080 },
+  { "name": "4-cover-1080.jpg", "query": "?shot=cover-one", "kind": "export", "w": 960, "h": 960, "budget": 174080 }
 ]
