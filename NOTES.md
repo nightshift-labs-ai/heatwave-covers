@@ -1,5 +1,81 @@
 # NOTES (HEATWAVE Cover Studio)
 
+## Status: M3a done (run 3, 19 Nov 2026, 16:35-17:00 EET): new shot-1 key art + painterly Poster Ink
+Short run: steps 1, 2 and 5 only. The editor fields for the new pieces (step 3) and new shots 2-4 (step 4) are for
+the next run; shots 2-4 are unchanged M2 files. Operator decision SHOT1_STYLE=ink: shot 1 stays Poster Ink.
+
+### What changed
+- **Key Art Slash** (`keyArtSlash`, engine/layouts.js) is now the first tile, key 1 and the default layout. The other
+  7 keep their order on keys 2-8, and the selftest presses 6 for Strip Five.
+  - **16:9:** a full-height hero about 58 % wide with a slanted right edge, and five slanted panels beside it: a big
+    top panel and two rows of two. **1:1:** the hero on top with four panels below. **4:5:** the hero on top, then
+    rows of two and three. Every size has 5-6 photo panels, and none is narrower than about 1/5 of the cover.
+  - Panels are polygons, clipped and separated by thin cream frame lines, with a cream outer border. The hit test
+    uses point-in-polygon (`insidePoly`), so clicks on slanted edges pick the right panel.
+  - **The title sits over the art** (engine/dressing.js `drawKeyArtTitle`):
+    - It crosses the hero's lower third and runs into the right panels. It is about 66 % of the cover wide and
+      tilted 3°.
+    - Fill: a gradient taken from the grade (cream, hot, deep hot). It has a heavy outline, a 6+-step extrude with a
+      soft drop shadow, an inner top highlight and 3 sparkle glints.
+    - The script sits below and to the right, and its top only reaches the bottom ~15 % of the caps. At sheet size it
+      reads "HEATWAVE", not "HFATWAVE".
+  - **Dressing.** All of it is drawn by the engine, and all the words are ours:
+    - 5 stars and the quote "HOTTER THAN THE ASPHALT" — THE PALM GAZETTE, above the title
+    - a HEAT ★★★★☆ pill
+    - a HOT / SUMMER ’26 seal on a panel seam
+    - 3 tilted white tags: THE CLOSER, CORAL CAUSEWAY · 7:15 PM, THE FIXER
+    - a palm-silhouette band with a striped-sun mark and the letter-spaced tagline
+    - a billing line of invented credits, a small HW mark and a drawn barcode
+  - `state.dressing` (stars / heat / seal / tags / billing) and `caption.quote` / `caption.tags` / `caption.billing`
+    are already read by the renderer, but there are no editor controls for them yet (step 3, next run).
+- **Painterly Poster Ink** (engine/ink.js). The toggle and the name are the same.
+  - Posterize is replaced by a Kuwahara filter on summed-area tables: it paints flat strokes but keeps faces
+    continuous-tone, with no bands.
+  - The lift to mean luminance 0.47 is gone. An S-curve keeps deep blacks and clips hot highlights to warm cream.
+  - Halftone only below a luminance of 0.14, never on skin, with a lighter paper tone.
+  - Ink lines are weighted by edge strength: full ink on silhouettes, about 40-60 % on interior detail, and 30 % on
+    skin.
+  - The grade has a new `keepHighlights` option. Poster Ink uses 0.7, so the gradient map is blended less in the
+    highlights and each photo's own sunset sky stays orange and pink.
+- **Shot 1** was re-cast with 6 distinct photos:
+  - woman-palms as the hero
+  - supercar-boulevard in the second-largest panel
+  - coupe-desert (a sunset sky, under the title's end)
+  - man-neon (a second face, in the free middle-right panel)
+  - speedboat and moto-causeway
+  - It uses neither the starter's boulevard.jpg nor pier.jpg. No photo is on more than two shots.
+
+### Before / after (shot 1, 1280x720 JPEG of the 1920 export)
+| | M2 | M3a |
+|---|---|---|
+| luminance std | 64 | **81** (target ≥ 72; rival #1: 77) |
+| pixels > 215 | 0.06 | **0.20** (target ≥ 0.10; rival #1: 0.12) |
+| size | 227.7 KiB | 205.8 KiB |
+| photo panels | 10 (4 slivers) | 6 (none under ~1/5 width) |
+| title | boxed, 52 % wide, script hides half of it | over the art, about 66 % wide, every letter clear |
+Read side by side at sheet size (out/sheet.jpg vs out/sheet_m2.jpg), the new cover won clearly:
+- the title is fully readable
+- the hero face is painted, smooth and has no dots
+- the second face reads
+- the car is sharp
+- three panels show glowing sunsets
+So it was kept.
+
+### Checks (this run)
+- dossier.json: 1,062,862 bytes, byte-identical across two runs.
+- Kit `check`: 4 passed, 0 failed. It notes that this kit copy is level 26 while the site is at 27, so the operator may
+  want to re-download it.
+- Sheet: GATE OK, with shots of 205.8 / 169.7 / 159.6 / 155.1 KiB.
+- selftest: 16 of 16 pass.
+- The name grep is clean.
+
+### Known issues
+- The hero's upper sky clips to pale cream (hazy), not orange. The supercar and coupe panels carry the sunset.
+- The big Kuwahara pass makes the first uncached 1920 render about 550-630 ms (M2: 215-290 ms). Cached exports still
+  take about 5-12 ms.
+- Shots 2-4 still show M2's posterized ink. Re-taking them with the new ink and the new layout is step 4, next run.
+- Dressing words are fixed defaults until the editor fields land (step 3).
+
 ## Status: M2 done (run 2, 19 Nov 2026, 15:14-15:51 EET)
 Shot 1 keeps M1's Poster Ink key-art look and layout (operator decision SHOT1_STYLE=ink); it was only made cleaner.
 
