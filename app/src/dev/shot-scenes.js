@@ -5,11 +5,11 @@ import { ensureCoverAssets, renderCover } from '../engine/render.js';
 import { pushHistory } from '../state.js';
 
 const SCENES = {
-  // Shot 1: 1920 x 1080, Key Art Slash, Sunset Strip, Poster Ink on, six distinct photos: the hero face, the
+  // Shot 1: 1920 x 1080, Key Art Slash, Sunset Strip, Poster Ink off (ink: 0; crisp at judge size), six distinct photos: the hero face, the
   // supercar in the second-largest panel, a sunset sky (under the title's end), a second face in the free middle-right
   // panel, the speedboat and the motorbike.
   'cover-keyart': {
-    layoutId: 'keyArtSlash', gradeId: 'sunsetStrip', size: [1920, 1080],
+    layoutId: 'keyArtSlash', gradeId: 'sunsetStrip', size: [1920, 1080], ink: 0,
     caption: { title: 'HEATWAVE', subtitle: 'Coastline Nights', tagline: 'ONE COASTLINE · SIX STORIES · NO CURFEW' },
     photos: ['woman-palms', 'supercar-boulevard', 'coupe-desert', 'man-neon', 'speedboat', 'moto-causeway'],
     panels: [
@@ -63,6 +63,12 @@ const SCENES = {
   },
 };
 
+// A scene's ink number as the studio's ink state: 0 is off (the slider keeps its default 0.8), anything else is on.
+function inkSetting(strength) {
+  const s = Math.min(1, Math.max(0, strength));
+  return s > 0 ? { on: true, strength: s } : { on: false, strength: 0.8 };
+}
+
 export async function runShotScene(name, studio) {
   const scene = SCENES[name] ?? SCENES['cover-keyart'];
   const { state } = studio;
@@ -70,7 +76,8 @@ export async function runShotScene(name, studio) {
   pushHistory(state); // setting up the scene is an edit like any other: Undo is live in the editor shot
   state.layoutId = scene.layoutId;
   state.gradeId = scene.gradeId;
-  state.ink = { on: true, strength: 0.8 };
+  // Poster Ink: each scene sets its own strength (0 = off; 0.8 when the scene says nothing).
+  state.ink = inkSetting(scene.ink ?? 0.8);
   // Scenes without a quote or tags keep the studio's defaults (the same words the engine falls back to).
   state.caption = { ...state.caption, ...scene.caption };
   if (scene.dressing) state.dressing = { ...state.dressing, ...scene.dressing };
@@ -79,6 +86,8 @@ export async function runShotScene(name, studio) {
   const q = new URLSearchParams(location.search);
   if (q.get('size')) { const [w, h] = q.get('size').split('x').map(Number); state.size = { w, h }; }
   if (q.get('grade')) state.gradeId = q.get('grade');
+  // &ink=0 turns Poster Ink off, &ink=<strength> (0..1) sets it, for A/B renders.
+  if (q.has('ink')) state.ink = inkSetting(Number(q.get('ink')) || 0);
   // Sky glow: on unless the scene or &glow=0 turns it off (for A/B renders).
   state.skyGlow = q.has('glow') ? q.get('glow') !== '0' : scene.skyGlow !== false;
   state.panels = scene.panels.map((p) => ({ ...p }));

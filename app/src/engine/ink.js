@@ -219,6 +219,23 @@ export function liftToMeanLuminance(imageData, target) {
   return target;
 }
 
+// The no-ink lift: mid-tones and highlights get the gamma lift toward the target mean, but the lift fades out below
+// about 0.25 and the toe is pushed down, so shadows stay deep (plum to near-black) instead of turning milky.
+export function liftKeepShadows(imageData, target) {
+  const d = imageData.data;
+  const mean = meanLuminance(imageData);
+  const gamma = mean < target && mean > 0.01 ? Math.log(target) / Math.log(mean) : 1;
+  const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+  const lut = new Uint8ClampedArray(256);
+  for (let v = 0; v < 256; v++) {
+    const x = v / 255;
+    let y = x + (Math.pow(x, gamma) - x) * smooth(0.1, 0.4, x);
+    y *= 0.72 + 0.28 * smooth(0, 0.32, y);
+    lut[v] = Math.round(255 * y);
+  }
+  for (let i = 0; i < d.length; i += 4) { d[i] = lut[d[i]]; d[i + 1] = lut[d[i + 1]]; d[i + 2] = lut[d[i + 2]]; }
+}
+
 export function meanLuminance(imageData) {
   const d = imageData.data;
   let sum = 0;

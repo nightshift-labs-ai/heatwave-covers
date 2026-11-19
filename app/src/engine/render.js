@@ -3,7 +3,7 @@
 
 import { layoutFor } from './layouts.js';
 import { applyGradeToPanel, gradeColorAt, autoLevelsBeforeGrade } from './grades.js';
-import { posterInk, smoothForInk, grainAndVignette, liftToMeanLuminance, skinMaskBeforeGrade } from './ink.js';
+import { posterInk, smoothForInk, grainAndVignette, liftKeepShadows, skinMaskBeforeGrade } from './ink.js';
 import { skyMaskBeforeGrade, paintSkyGlow, hasSkyPalette } from './sky-glow.js';
 import { drawTitleBlock, drawHalftoneSun, drawStickerBadge } from './lettering.js';
 import { drawKeyArtTitle, drawHeatPill, drawPanelTag, drawSeal, drawPalmBand, drawBilling, DRESSING_DEFAULTS } from './dressing.js';
@@ -149,7 +149,7 @@ function panelArt(photo, slot, pw, ph, state, W, i, fast) {
   applyGradeToPanel(data, state.gradeId, { keepHighlights: ink ? 0.7 : 0 });
   if (sky) paintSkyGlow(data, sky, state.gradeId);
   if (ink) posterInk(data, lumHalf, { coverW: W, strength: state.ink.strength, paper: gradeColorAt(state.gradeId, 0.5), seed: 17 + i * 101, skin });
-  else liftToMeanLuminance(data, 0.44);
+  else liftKeepShadows(data, 0.44);
   grainAndVignette(data, 911 + i * 37);
   cctx.putImageData(data, 0, 0);
   if (!fast) {
