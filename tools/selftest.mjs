@@ -96,11 +96,11 @@ try {
   const keptSize = await one.getAttribute('#size-buttons button.on', 'data-size');
   check(keptTitle === 'TEST TITLE' && keptSize === '1920x1080', `settings restored from localStorage (${keptTitle}, ${keptSize})`);
   const gradeBefore = await one.getAttribute('#grade-swatches button.on', 'data-grade');
-  await one.keyboard.press('5');
+  await one.keyboard.press('6');
   await one.keyboard.press('g');
   const layoutOn = await one.getAttribute('#layout-tiles button.on', 'data-layout');
   const gradeOn = await one.getAttribute('#grade-swatches button.on', 'data-grade');
-  check(layoutOn === 'stripFive' && gradeOn !== gradeBefore, `keys 5 and G pick stripFive and the next grade (${layoutOn} / ${gradeBefore} -> ${gradeOn})`);
+  check(layoutOn === 'stripFive' && gradeOn !== gradeBefore, `keys 6 and G pick stripFive and the next grade (${layoutOn} / ${gradeBefore} -> ${gradeOn})`);
   // Shortcut popover: "?" opens it, Esc closes it.
   await one.keyboard.press('?');
   const popOpen = await one.isVisible('#keys-pop');

@@ -5,11 +5,13 @@ import { layoutFor } from './layouts.js';
 import { applyGradeToPanel, gradeColorAt, autoLevelsBeforeGrade } from './grades.js';
 import { posterInk, smoothForInk, grainAndVignette, liftToMeanLuminance, skinMaskBeforeGrade } from './ink.js';
 import { drawTitleBlock, drawHalftoneSun, drawStickerBadge } from './lettering.js';
+import { drawKeyArtTitle, drawHeatPill, drawPanelTag, drawSeal, drawPalmBand, drawBilling, DRESSING_DEFAULTS } from './dressing.js';
 
 // Draw the whole cover for `state` into ctx at W x H. opts.fastPanel: index of a panel being dragged (drawn with
 // grade only, no ink, until the drag ends).
 export function renderCover(state, W, H, ctx, opts = {}) {
   const geo = layoutFor(state.layoutId, W, H);
+  if (geo.kind === 'keyart') { renderKeyArt(state, geo, W, H, ctx, opts); return geo; }
   ctx.save();
   ctx.fillStyle = '#0b0b12';
   ctx.fillRect(0, 0, W, H);
@@ -30,6 +32,46 @@ export function renderCover(state, W, H, ctx, opts = {}) {
   }
   ctx.restore();
   return geo;
+}
+
+// Key Art Slash: cream paper and outer border, slanted panels clipped to their polygons with cream frame lines,
+// then the band, billing line, tags, seal, title (with stars and quote) and the HEAT pill on top.
+function renderKeyArt(state, geo, W, H, ctx, opts) {
+  const unit = Math.min(W, H), cap = state.caption ?? {};
+  const show = { stars: true, heat: true, seal: true, tags: true, billing: true, ...(state.dressing ?? {}) };
+  ctx.save();
+  ctx.fillStyle = '#f6efe0';
+  ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#0b0b12';
+  ctx.fillRect(geo.art.x, geo.art.y, geo.art.w, geo.art.h);
+  geo.panels.forEach((p, i) => {
+    const slot = state.panels[i] ?? { photo: -1, zoom: 1, fx: 0.5, fy: 0.38 };
+    ctx.save();
+    ctx.beginPath();
+    p.poly.forEach(([x, y], k) => (k ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+    ctx.closePath();
+    ctx.clip();
+    drawPanelImage(ctx, p, state.photos[slot.photo], slot, state, W, i, opts);
+    ctx.restore();
+  });
+  ctx.strokeStyle = '#f6efe0'; ctx.lineWidth = geo.frame; ctx.lineJoin = 'miter';
+  for (const p of geo.panels) {
+    ctx.beginPath();
+    p.poly.forEach(([x, y], k) => (k ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+    ctx.closePath();
+    ctx.stroke();
+  }
+  drawPalmBand(ctx, geo.band, cap.tagline, state.gradeId);
+  if (show.billing) drawBilling(ctx, geo.billing, cap.billing || undefined);
+  else { ctx.fillStyle = '#0b0710'; ctx.fillRect(geo.billing.x, geo.billing.y, geo.billing.w, geo.billing.h); }
+  if (show.tags) {
+    const tags = cap.tags ?? DRESSING_DEFAULTS.tags;
+    geo.tags.forEach((t, k) => { if (tags[k]) drawPanelTag(ctx, t.at[0], t.at[1], t.rot, String(tags[k]).toUpperCase(), unit * 0.042); });
+  }
+  if (show.seal) drawSeal(ctx, geo.seal[0], geo.seal[1], unit * 0.072);
+  drawKeyArtTitle(ctx, geo.title, cap, { W, H, gradeId: state.gradeId, stars: show.stars });
+  if (show.heat) drawHeatPill(ctx, geo.pill.x, geo.pill.y, unit * 0.05, geo.pill.align);
+  ctx.restore();
 }
 
 // Render at the exact size, encode PNG, download heatwave-<w>x<h>.png. Resolves with { blob, ms, name }.

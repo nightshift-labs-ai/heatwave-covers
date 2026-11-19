@@ -4,7 +4,7 @@
 export function createStudioState() {
   return {
     photos: [],
-    layoutId: 'keyArtNine',
+    layoutId: 'keyArtSlash',
     gradeId: 'sunsetStrip',
     ink: { on: true, strength: 0.8 },
     caption: { title: 'HEATWAVE', subtitle: 'Coastline Nights', tagline: 'IN STORES SOMEWHERE SOON' },

@@ -2,7 +2,7 @@
 // double-click to swap in the next photo. While dragging, only grade is applied to the active panel (fast path);
 // Poster Ink comes back on pointerup or after 150 ms idle.
 
-import { layoutFor } from '../engine/layouts.js';
+import { layoutFor, insidePoly } from '../engine/layouts.js';
 import { cropRect } from '../engine/render.js';
 
 export function selectPanel(state, index) {
@@ -31,6 +31,7 @@ export function hitTestPanel(state, x, y, W, H) {
   const geo = layoutFor(state.layoutId, W, H);
   for (let i = geo.panels.length - 1; i >= 0; i--) {
     const p = geo.panels[i];
+    if (p.poly) { if (insidePoly(p.poly, x, y)) return { index: i, panel: p }; continue; }
     const cx = p.x + p.w / 2, cy = p.y + p.h / 2;
     const c = Math.cos(-p.rot), s = Math.sin(-p.rot);
     const lx = (x - cx) * c - (y - cy) * s, ly = (x - cx) * s + (y - cy) * c;

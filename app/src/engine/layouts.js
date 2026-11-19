@@ -3,6 +3,51 @@
 // them into pixels for an exact cover size with scaled black gutters, so a layout re-flows and never stretches.
 
 export const LAYOUTS = {
+  // Key Art Slash: the poster layout. A full-height hero, five panels cut on slants beside it (or under it in 1:1 and
+  // 4:5), thin cream frame lines and a cream outer border, the title over the art, a palm band and a billing line.
+  // Polygons are in 0..1 of the art area (the cover minus border, band and billing line). No panel is narrower than
+  // about 1/6 of the cover.
+  keyArtSlash: {
+    label: 'Key Art Slash',
+    kind: 'keyart',
+    land: {
+      polys: [
+        [[0, 0], [0.6, 0], [0.555, 1], [0, 1]],
+        [[0.6, 0], [1, 0], [1, 0.47], [0.581, 0.42]],
+        [[0.581, 0.42], [0.79, 0.445], [0.775, 0.712], [0.568, 0.72]],
+        [[0.79, 0.445], [1, 0.47], [1, 0.7], [0.775, 0.712]],
+        [[0.568, 0.72], [0.765, 0.712], [0.79, 1], [0.555, 1]],
+        [[0.765, 0.712], [1, 0.7], [1, 1], [0.79, 1]],
+      ],
+      title: { cx: 0.38, cy: 0.755, w: 0.66, tilt: -3 },
+      seal: [0.581, 0.42], pill: [0.985, 0.035, 'right'],
+      tags: [[0, 0.04, 0.16, -3], [1, 0.62, 0.07, 2.5], [5, 0.84, 0.75, -2]],
+    },
+    square: {
+      polys: [
+        [[0, 0], [1, 0], [1, 0.52], [0, 0.58]],
+        [[0, 0.58], [0.39, 0.555], [0.36, 1], [0, 1]],
+        [[0.39, 0.555], [0.7, 0.537], [0.68, 1], [0.36, 1]],
+        [[0.7, 0.537], [1, 0.52], [1, 1], [0.68, 1]],
+      ],
+      title: { cx: 0.5, cy: 0.5, w: 0.8, tilt: -3 },
+      seal: [0.7, 0.537], pill: [0.975, 0.03, 'right'],
+      tags: [[0, 0.04, 0.05, -3], [3, 0.72, 0.9, 2.5]],
+    },
+    tall: {
+      polys: [
+        [[0, 0], [1, 0], [1, 0.5], [0, 0.55]],
+        [[0, 0.55], [0.58, 0.521], [0.55, 0.77], [0, 0.785]],
+        [[0.58, 0.521], [1, 0.5], [1, 0.76], [0.55, 0.77]],
+        [[0, 0.785], [0.36, 0.776], [0.34, 1], [0, 1]],
+        [[0.36, 0.776], [0.69, 0.768], [0.67, 1], [0.34, 1]],
+        [[0.69, 0.768], [1, 0.76], [1, 1], [0.67, 1]],
+      ],
+      title: { cx: 0.5, cy: 0.47, w: 0.86, tilt: -3 },
+      seal: [0.58, 0.521], pill: [0.97, 0.025, 'right'],
+      tags: [[0, 0.04, 0.04, -3], [2, 0.6, 0.55, 2.5], [4, 0.38, 0.8, -2]],
+    },
+  },
   keyArtNine: {
     label: 'Key Art Nine',
     kind: 'grid',
@@ -109,7 +154,7 @@ export const LAYOUTS = {
   },
 };
 
-export const LAYOUT_ORDER = ['keyArtNine', 'heroAndSix', 'heroFour', 'tiltedSnapshots', 'stripFive', 'gridFour', 'fullBleedInset'];
+export const LAYOUT_ORDER = ['keyArtSlash', 'keyArtNine','heroAndSix', 'heroFour', 'tiltedSnapshots', 'stripFive', 'gridFour', 'fullBleedInset'];
 
 export const COVER_SIZES = [
   { w: 1080, h: 1080, label: '1080 × 1080', sub: 'square' },
@@ -123,6 +168,7 @@ export function layoutFor(layoutId, W, H) {
   const layout = LAYOUTS[layoutId] ?? LAYOUTS.keyArtNine;
   const spec = layout[aspectClass(W, H)];
   const g = gutterFor(W, H);
+  if (layout.kind === 'keyart') return keyArtGeometry(spec, W, H);
   const title = rectToPixels(spec.title, W, H, 0, 0);
   if (layout.kind === 'snapshots') {
     const unit = Math.min(W, H);
@@ -152,6 +198,42 @@ export function layoutFor(layoutId, W, H) {
   }
   const panels = spec.panels.map((r) => ({ ...rectToPixels(r, W, H, g, g / 2), rot: 0, snap: false }));
   return { kind: 'grid', panels, title: rectToPixels(spec.title, W, H, g, g / 2), gutter: g, overlay: !!spec.overlay };
+}
+
+// Key art geometry in pixels: border, art area, slanted panel polygons (with their bounding boxes for the panel
+// art and the hit test), the title anchor, the bottom band, the billing line and the dressing anchors.
+function keyArtGeometry(spec, W, H) {
+  const unit = Math.min(W, H);
+  const border = Math.max(4, Math.round(unit * 0.012));
+  const frame = Math.max(3, Math.round(unit * 0.0075));
+  const billH = Math.round(H * 0.032), bandH = Math.round(H * 0.085);
+  const art = { x: border, y: border, w: W - 2 * border, h: H - 2 * border - bandH - billH };
+  const px = ([u, v]) => [art.x + u * art.w, art.y + v * art.h];
+  const panels = spec.polys.map((poly) => {
+    const pts = poly.map(px);
+    const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
+    const x = Math.floor(Math.min(...xs)), y = Math.floor(Math.min(...ys));
+    return { x, y, w: Math.ceil(Math.max(...xs)) - x, h: Math.ceil(Math.max(...ys)) - y, rot: 0, snap: false, poly: pts };
+  });
+  const t = spec.title;
+  return {
+    kind: 'keyart', panels, gutter: frame, overlay: true, border, frame, art,
+    title: { cx: art.x + t.cx * art.w, cy: art.y + t.cy * art.h, w: t.w * W, tilt: (t.tilt * Math.PI) / 180, x: art.x + (t.cx - t.w / 2) * art.w, y: art.y + (t.cy - 0.1) * art.h, h: art.h * 0.2 },
+    band: { x: 0, y: art.y + art.h + frame, w: W, h: bandH - frame },
+    billing: { x: border, y: H - border - billH, w: W - 2 * border, h: billH },
+    seal: px(spec.seal), pill: { x: spec.pill[0] * W, y: art.y + spec.pill[1] * art.h, align: spec.pill[2] },
+    tags: spec.tags.map(([i, u, v, deg]) => ({ panel: i, at: px([u, v]), rot: (deg * Math.PI) / 180 })),
+  };
+}
+
+// Point in polygon (even-odd), for hit tests on slanted panels.
+export function insidePoly(poly, x, y) {
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [xi, yi] = poly[i], [xj, yj] = poly[j];
+    if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
 }
 
 // Gutter: 12 px per 1080 of the long side, near-black #0b0b12.

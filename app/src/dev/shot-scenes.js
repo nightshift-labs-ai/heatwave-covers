@@ -5,18 +5,17 @@ import { ensureCoverAssets, renderCover } from '../engine/render.js';
 import { pushHistory } from '../state.js';
 
 const SCENES = {
-  // Shot 1: 1920 x 1080, Key Art Nine, Sunset Strip, Poster Ink on, eight distinct photos.
+  // Shot 1: 1920 x 1080, Key Art Slash, Sunset Strip, Poster Ink on, six distinct photos: the hero face, the
+  // supercar in the second-largest panel, a face, a sunset sky, the speedboat and the motorbike.
   'cover-keyart': {
-    layoutId: 'keyArtNine', gradeId: 'sunsetStrip', size: [1920, 1080],
-    caption: { title: 'HEATWAVE', subtitle: 'Coastline Nights', tagline: 'IN STORES SOMEWHERE SOON' },
-    // Nine distinct photos, no face twice: hero, small wide column (skyline, neon motel, speedboat), tall row
-    // (four faces), big right panel (the supercar).
-    photos: ['woman-palms', 'marina-skyline', 'coupe-desert', 'speedboat', 'lady-motel', 'man-neon', 'pier-fisher', 'flamingo-boardwalk', 'supercar-boulevard'],
+    layoutId: 'keyArtSlash', gradeId: 'sunsetStrip', size: [1920, 1080],
+    caption: { title: 'HEATWAVE', subtitle: 'Coastline Nights', tagline: 'ONE COASTLINE · SIX STORIES · NO CURFEW' },
+    photos: ['woman-palms', 'supercar-boulevard', 'man-neon', 'coupe-desert', 'speedboat', 'moto-causeway'],
     panels: [
       { photo: 0, zoom: 1, fx: 0.5, fy: 0.3 },
-      { photo: 1, zoom: 1.15, fx: 0.4, fy: 0.42 }, { photo: 2, zoom: 1.1, fx: 0.5, fy: 0.5 }, { photo: 3, zoom: 1.3, fx: 0.5, fy: 0.6 },
-      { photo: 4, zoom: 1.6, fx: 0.6, fy: 0.24 }, { photo: 5, zoom: 1.05, fx: 0.6, fy: 0.4 }, { photo: 6, zoom: 1.3, fx: 0.36, fy: 0.36 }, { photo: 7, zoom: 1.15, fx: 0.55, fy: 0.3 },
-      { photo: 8, zoom: 1.05, fx: 0.52, fy: 0.55 },
+      { photo: 1, zoom: 1.05, fx: 0.52, fy: 0.5 },
+      { photo: 2, zoom: 1.15, fx: 0.55, fy: 0.32 }, { photo: 3, zoom: 1.1, fx: 0.5, fy: 0.4 },
+      { photo: 4, zoom: 1.2, fx: 0.5, fy: 0.55 }, { photo: 5, zoom: 1.1, fx: 0.5, fy: 0.45 },
     ],
   },
   // Shot 3: 1080 x 1350, tilted snapshots over a neon sky.
