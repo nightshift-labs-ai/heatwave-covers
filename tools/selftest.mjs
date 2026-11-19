@@ -46,6 +46,20 @@ try {
   }
   const ms = await page.evaluate(() => window.__lastExport?.ms);
   console.log(`last export render: ${ms} ms`);
+
+  // One photo through the real file input: every panel gets its own crop; keys 4 (Strip Five), G (grade), E (export).
+  const one = await context.newPage();
+  one.on('pageerror', (e) => errors.push(e.message));
+  await one.goto(`${base}index.html`);
+  await one.setInputFiles('#photo-input', 'app/samples/woman-palms.jpg');
+  await one.waitForFunction(() => document.querySelectorAll('#photo-tray img').length === 1);
+  await one.keyboard.press('4');
+  await one.keyboard.press('g');
+  const layoutOn = await one.getAttribute('#layout-tiles button.on', 'data-layout');
+  const gradeOn = await one.getAttribute('#grade-swatches button.on', 'data-grade');
+  check(layoutOn === 'stripFive' && gradeOn === 'neonNight', `keys 4 and G pick stripFive / neonNight (${layoutOn} / ${gradeOn})`);
+  const [dl1] = await Promise.all([one.waitForEvent('download'), one.keyboard.press('e')]);
+  check(dl1.suggestedFilename() === 'heatwave-1920x1080.png', `key E exports one-photo cover -> ${dl1.suggestedFilename()}`);
   check(errors.length === 0, `no page errors${errors.length ? `: ${errors.join(' | ')}` : ''}`);
 } finally {
   await browser.close();

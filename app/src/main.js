@@ -8,6 +8,8 @@ import {
 } from './editor/controls.js';
 import { renderCover, exportCoverPng, ensureCoverAssets } from './engine/render.js';
 import { createStudioState, pushHistory, undo, redo } from './state.js';
+import { LAYOUT_ORDER } from './engine/layouts.js';
+import { GRADE_ORDER } from './engine/grades.js';
 
 const SAMPLE_PHOTOS = ['woman-palms', 'lady-motel', 'man-neon', 'pool-neon', 'coupe-desert', 'speedboat', 'moto-causeway', 'couple-pier', 'boulevard', 'pier'];
 
@@ -140,10 +142,18 @@ export async function bootHeatwaveStudio() {
     syncSteps();
     status.textContent = `Saved ${name} (rendered in ${ms} ms).`;
   });
+  // Keyboard: Ctrl+Z / Ctrl+Shift+Z undo/redo; outside text fields 1-4 pick a layout, G cycles the grade, E exports.
   document.addEventListener('keydown', (e) => {
-    if (!(e.ctrlKey || e.metaKey) || e.key.toLowerCase() !== 'z') return;
-    e.preventDefault();
-    if (e.shiftKey ? redo(state) : undo(state)) { syncControls(); refresh(); }
+    const key = e.key.toLowerCase();
+    if ((e.ctrlKey || e.metaKey) && key === 'z') {
+      e.preventDefault();
+      if (e.shiftKey ? redo(state) : undo(state)) { syncControls(); refresh(); }
+      return;
+    }
+    if (e.ctrlKey || e.metaKey || e.altKey || e.target.closest('input, textarea')) return;
+    if (LAYOUT_ORDER[+key - 1]) { state.layoutId = LAYOUT_ORDER[+key - 1]; onChange('layout'); }
+    else if (key === 'g') { state.gradeId = GRADE_ORDER[(GRADE_ORDER.indexOf(state.gradeId) + 1) % GRADE_ORDER.length]; onChange('grade'); }
+    else if (key === 'e') $('export-png').click();
   });
   window.addEventListener('resize', () => refresh());
 
