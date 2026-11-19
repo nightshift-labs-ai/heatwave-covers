@@ -71,6 +71,12 @@ try {
   }
   const ms = await page.evaluate(() => window.__lastExport?.ms);
   console.log(`last export render: ${ms} ms`);
+  const all = [];
+  page.on('download', (d) => all.push(d.suggestedFilename()));
+  await page.click('#export-all');
+  await page.waitForFunction(() => (window.__lastExportAll ?? []).length === 3, null, { timeout: 30000 });
+  await page.waitForTimeout(400);
+  check(all.length === 3 && ['1080x1080', '1080x1350', '1920x1080'].every((s) => all.includes(`heatwave-${s}.png`)), `Export all 3 sizes -> ${all.join(', ')}`);
 
   // One photo through the real file input: every panel gets its own crop; keys 5 (Strip Five), G (grade), E (export).
   const one = await context.newPage();

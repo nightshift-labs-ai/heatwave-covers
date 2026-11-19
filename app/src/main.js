@@ -8,7 +8,7 @@ import {
 } from './editor/controls.js';
 import { renderCover, exportCoverPng, ensureCoverAssets } from './engine/render.js';
 import { createStudioState, pushHistory, pushSnapshot, snapshotState, undo, redo } from './state.js';
-import { LAYOUT_ORDER } from './engine/layouts.js';
+import { LAYOUT_ORDER, COVER_SIZES } from './engine/layouts.js';
 import { GRADE_ORDER } from './engine/grades.js';
 
 const SAMPLE_PHOTOS = [
@@ -189,6 +189,21 @@ export async function bootHeatwaveStudio() {
     state.step = 3;
     syncSteps();
     status.textContent = `Saved ${name} (rendered in ${ms} ms).`;
+  });
+  // Export all 3 sizes: the same photos, crops and caption re-flowed to square, portrait and wide, one PNG each.
+  $('export-all').addEventListener('click', async () => {
+    const names = [];
+    let total = 0;
+    for (const s of COVER_SIZES) {
+      status.textContent = `Rendering ${s.w} × ${s.h} (${names.length + 1} of ${COVER_SIZES.length})…`;
+      const { ms, name } = await exportCoverPng(state, s.w, s.h);
+      names.push(name); total += ms;
+      await new Promise((r) => setTimeout(r, 250)); // browsers drop downloads fired in the same tick
+    }
+    window.__lastExportAll = names;
+    state.step = 3;
+    syncSteps();
+    status.textContent = `Saved ${names.join(', ')} (${total} ms).`;
   });
   // Undo / redo: buttons under the preview, Ctrl+Z, Ctrl+Y or Ctrl+Shift+Z.
   $('undo-btn').addEventListener('click', () => stepHistory(true));
