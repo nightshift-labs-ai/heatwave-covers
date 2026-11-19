@@ -1,5 +1,76 @@
 # NOTES (HEATWAVE Cover Studio)
 
+## Status: M4 done (run 5, 19 Nov 2026, 18:34-18:55 EET): Sky glow on photo panels + shot 1 A/B
+Short run on LIGHT, not layout. Key Art Slash, the title, the dressing and the Poster Ink look are unchanged.
+
+### What changed
+- **Sky glow** (`engine/sky-glow.js`, wired in `panelArt` in engine/render.js) is a real engine pass for every
+  photo panel, not an overlay on one shot.
+  - **Mask** (`skyMaskBeforeGrade`). It is taken from the crop before the grade, at the same point as the skin
+    mask, so the photo's own sky can still be told apart.
+    - Candidates: bright, low-saturation pixels (haze, cream, cloud), bright warm haze, or pale blue.
+    - A 4-connected flood fill from the panel's top edge keeps only connected candidates. It stops at luminance
+      steps above 0.09, so it does not leak into walls or shirts.
+    - The mask fades out over the lower third and is feathered with a two-pass box blur.
+    - It is zero on skin and fades beside skin, so faces, hair, palms and buildings keep their colour and ink
+      outlines. With no sky (e.g. an all-dark photo), there is no mask.
+  - **Skin guard fix.** The RGB skin rule also fired on the hero's pale warm haze (e.g. 234,220,193). That removed
+    most of the sky in the first trial. The sky guard now keeps every skin pixel except very bright, washed ones
+    (L > 0.84 and saturation < 0.42).
+  - **Paint** (`paintSkyGlow`). It runs after the grade and before Poster Ink, so Kuwahara paints the sky into
+    strokes and the ink lines stay on top.
+    - Per-grade palettes run from the top to the sky's low edge. Sunset Strip and Golden Hour go violet-magenta,
+      then pink, then hot orange. Neon Night goes indigo, then violet, then magenta.
+    - A soft glow sits at the sky's brightest point (the sun's side).
+    - A luminance texture factor (0.64-1.14) keeps the clouds. It is capped so the sun's side stays orange and
+      does not tip into the ink's cream highlight clip.
+    - Miami Teal and Noir Heat have no palette, so they keep their own skies.
+  - **Editor:** a 'Sky glow' toggle sits under the grade chips (`#sky-glow`, the only new id). It is on by default.
+    Each flip is one undo step. It is saved in localStorage (boolean only) and is part of the cache key. Shot scenes
+    take `&glow=0|1` for A/B renders.
+  - **selftest:** 22 checks, all pass (18 before). New:
+    - the mask is empty on an all-dark photo
+    - 0 of 1,521 skin pixels are masked next to a pale sky (sky 35 %)
+    - the toggle is on by default and is one undo/redo step
+    - the off state comes back from localStorage
+- **Shot 1** was re-exported with Sky glow on. The scene, layout, photos, title, 1280x720 size and JPEG loop are the
+  same as before; the file is 207.3 KiB.
+
+### A/B (out/ab/ab_768.jpg, read next to briefs' rival top-4): KEPT
+At 768x432 the hero's sky, which was a washed cream third of the cover, now runs violet at the top, through pink, to
+hot orange low by the palms. That is the rivals' sunset light. The face is the same and still reads as a face. The
+title and dressing are pixel-for-pixel the same layout, and nothing is smeared.
+
+| shot 1 | M3b | M4 |
+|---|---|---|
+| luminance std | 81 | 77 (rival #1: 77) |
+| pixels > 215 | 0.20 | 0.15 (rival #1: 0.12) |
+| size | 205.8 KiB | 207.3 KiB |
+
+The drop in bright pixels is the cream sky becoming saturated mid-tones. Both numbers are still above the M3a
+targets (std ≥ 72, bright ≥ 0.10).
+
+**Shot 4 was not re-taken.** In a trial with Sky glow, the mask caught the motel's pale walls where they touch the
+top edge and painted them in magenta patches, which is worse than the current file.
+
+### Checks (this run)
+- dossier.json: 1,088,599 bytes (1.04 MiB), byte-identical across two runs. main.ts still runs without the
+  `ulimit -v` limit, as before.
+- Kit `check`: 4 passed, 0 failed. The kit copy is still level 26 while the site is at 27, so the operator may want
+  to re-download it.
+- Shot gate: 207.3 / 159.1 / 163.5 / 168.5 KiB. All are ≤ 256 KiB, with the long side ≤ 1280 and the short side
+  ≥ 480. The sheet tool prints GATE OK.
+- The name grep over app/ prints nothing.
+
+### Known issues
+- A narrow cream column of sun glare is left between two palm trunks, left of the hero's head. The trunks are
+  warm-lit, so they pass the skin rule, and the fade beside skin keeps the glow off them.
+- Pale walls connected to the top edge, like shot 4's motel, are treated as sky and get patchy colour. A wall test
+  (straight vertical edges, or a texture limit) would fix this.
+- Shot 2 (the editor) was not re-taken, so it does not show the Sky glow toggle yet.
+- Sky glow cost was not measured on its own. With it on, shot 1's uncached scene render took 490-725 ms across four
+  runs (M3a, without it: 550-630 ms).
+
 ## Status: M3b done (run 4, 19 Nov 2026, 16:50-17:04 EET): Poster extras in the editor + shots 2-4 re-taken
 Short run: steps 3, 4 and 5 only. Shot 1 is M3a's file, untouched (operator decision SHOT1_STYLE=ink).
 
@@ -173,10 +244,10 @@ Shot 1 keeps M1's Poster Ink key-art look and layout (operator decision SHOT1_ST
 ## Shots (screenshots/; no photo on more than two shots)
 | shot | content | file |
 |---|---|---|
-Current set (M3b):
+Current set (M4; shots 2-4 from M3b):
 | shot | content | file |
 |---|---|---|
-| 1-cover-1920.jpg | exported 1920x1080: Key Art Slash, Sunset Strip, painterly Poster Ink, 6 distinct photos (M3a) | 1280x720, 205.8 KiB |
+| 1-cover-1920.jpg | exported 1920x1080: Key Art Slash, Sunset Strip, painterly Poster Ink, Sky glow on, 6 distinct photos (M4) | 1280x720, 207.3 KiB |
 | 2-editor.jpg | editor 1280x800: Key Art Slash (NIGHT DRIVE), hero selected, 8 layout tiles, grade chips, Poster extras toggles + quote/tag fields, Undo live | 159.1 KiB |
 | 3-cover-1080x1350.jpg | exported 1080x1350: Key Art Slash, Neon Night, SALT & SIRENS, 6 photos | 864x1080, 163.5 KiB |
 | 4-cover-1080.jpg | exported 1080x1080: Key Art Slash from ONE photo (lady-motel) in 5 crops, Golden Hour, MOTEL MIRAGE | 960x960, 168.5 KiB |
