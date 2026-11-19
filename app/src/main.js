@@ -6,7 +6,7 @@ import { bindTitleDoubleClickEdit } from './editor/title-edit.js';
 import { bindPanelMenu } from './editor/panel-menu.js';
 import {
   buildLayoutTiles, syncLayoutTiles, buildGradeSwatches, syncGradeSwatches, bindInkControls, bindCaptionFields,
-  bindPosterExtras, syncPosterExtras,
+  bindPosterExtras, syncPosterExtras, bindSkyGlow,
   buildSizeButtons, syncSizeButtons, renderPhotoTray,
 } from './editor/controls.js';
 import { renderCover, exportCoverPng, ensureCoverAssets } from './engine/render.js';
@@ -83,6 +83,7 @@ export async function bootHeatwaveStudio() {
     $('caption-tagline').value = state.caption.tagline;
     syncPosterExtras($('poster-extras'), state);
     $('ink-toggle').checked = state.ink.on;
+    $('sky-glow').checked = state.skyGlow !== false;
     document.querySelector('.ink-strength').value = state.ink.strength;
     syncLayoutTiles($('layout-tiles'), state);
     syncGradeSwatches($('grade-swatches'), state);
@@ -101,7 +102,7 @@ export async function bootHeatwaveStudio() {
     if (kind !== 'caption' || now - lastCaptionEdit > 1200) pushSnapshot(state, settled);
     if (kind === 'caption') lastCaptionEdit = now;
     if (kind === 'layout') { autoFillPanels(state); state.selected = -1; state.step = Math.max(state.step, 3); }
-    if (kind === 'grade' || kind === 'ink' || kind === 'size') state.step = Math.max(state.step, state.photos.length ? 3 : 1);
+    if (kind === 'grade' || kind === 'ink' || kind === 'skyGlow' || kind === 'size') state.step = Math.max(state.step, state.photos.length ? 3 : 1);
     syncControls();
     scheduleRefresh();
   }
@@ -204,6 +205,7 @@ export async function bootHeatwaveStudio() {
   bindInkControls($('ink-toggle'), document.querySelector('.ink-strength'), state, onChange);
   bindCaptionFields({ title: $('caption-title'), subtitle: $('caption-subtitle'), tagline: $('caption-tagline') }, state, onChange);
   bindPosterExtras($('poster-extras'), state, onChange);
+  bindSkyGlow($('sky-glow'), state, onChange);
 
   $('export-png').addEventListener('click', async () => {
     status.textContent = `Rendering ${state.size.w} × ${state.size.h}…`;

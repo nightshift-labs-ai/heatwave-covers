@@ -52,6 +52,11 @@ export function bindInkControls(toggle, slider, state, onChange) {
   slider.addEventListener('change', () => { state.ink.strength = +slider.value; onChange('ink'); });
 }
 
+// Sky glow toggle in the Grade section: one undo step per flip (it goes through onChange like the ink toggle).
+export function bindSkyGlow(toggle, state, onChange) {
+  toggle.addEventListener('change', () => { state.skyGlow = toggle.checked; onChange('skyGlow'); });
+}
+
 export function bindCaptionFields(fields, state, onChange) {
   for (const [key, input] of Object.entries(fields)) {
     input.addEventListener('input', () => { state.caption[key] = input.value; onChange('caption'); });

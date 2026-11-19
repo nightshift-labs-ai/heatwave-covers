@@ -4,6 +4,7 @@
 import { layoutFor } from './layouts.js';
 import { applyGradeToPanel, gradeColorAt, autoLevelsBeforeGrade } from './grades.js';
 import { posterInk, smoothForInk, grainAndVignette, liftToMeanLuminance, skinMaskBeforeGrade } from './ink.js';
+import { skyMaskBeforeGrade, paintSkyGlow, hasSkyPalette } from './sky-glow.js';
 import { drawTitleBlock, drawHalftoneSun, drawStickerBadge } from './lettering.js';
 import { drawKeyArtTitle, drawHeatPill, drawPanelTag, drawSeal, drawPalmBand, drawBilling, DRESSING_DEFAULTS } from './dressing.js';
 
@@ -132,7 +133,8 @@ function drawSnapshot(ctx, p, photo, slot, state, W, i, opts) {
 const artCache = new Map();
 function panelArt(photo, slot, pw, ph, state, W, i, fast) {
   const ink = state.ink.on && !fast;
-  const key = `${photo.id}|${slot.zoom.toFixed(3)}|${slot.fx.toFixed(3)}|${slot.fy.toFixed(3)}|${pw}x${ph}|${state.gradeId}|${ink ? state.ink.strength : 0}|${W}`;
+  const glow = state.skyGlow !== false && hasSkyPalette(state.gradeId);
+  const key = `${photo.id}|${slot.zoom.toFixed(3)}|${slot.fx.toFixed(3)}|${slot.fy.toFixed(3)}|${pw}x${ph}|${state.gradeId}|${ink ? state.ink.strength : 0}|${W}|${glow ? 'g' : ''}`;
   const hit = artCache.get(key);
   if (hit) { artCache.delete(key); artCache.set(key, hit); return hit; }
   const c = document.createElement('canvas');
@@ -140,10 +142,12 @@ function panelArt(photo, slot, pw, ph, state, W, i, fast) {
   const cctx = c.getContext('2d', { willReadFrequently: true });
   drawCrop(cctx, photo, slot, pw, ph);
   const data = cctx.getImageData(0, 0, pw, ph);
-  const skin = ink ? skinMaskBeforeGrade(data) : null;
+  const skin = ink || glow ? skinMaskBeforeGrade(data) : null;
+  const sky = glow ? skyMaskBeforeGrade(data, skin) : null;
   const lumHalf = ink ? smoothForInk(data, W) : null;
   autoLevelsBeforeGrade(data);
   applyGradeToPanel(data, state.gradeId, { keepHighlights: ink ? 0.7 : 0 });
+  if (sky) paintSkyGlow(data, sky, state.gradeId);
   if (ink) posterInk(data, lumHalf, { coverW: W, strength: state.ink.strength, paper: gradeColorAt(state.gradeId, 0.5), seed: 17 + i * 101, skin });
   else liftToMeanLuminance(data, 0.44);
   grainAndVignette(data, 911 + i * 37);

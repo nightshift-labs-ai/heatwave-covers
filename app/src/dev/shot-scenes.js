@@ -79,6 +79,8 @@ export async function runShotScene(name, studio) {
   const q = new URLSearchParams(location.search);
   if (q.get('size')) { const [w, h] = q.get('size').split('x').map(Number); state.size = { w, h }; }
   if (q.get('grade')) state.gradeId = q.get('grade');
+  // Sky glow: on unless the scene or &glow=0 turns it off (for A/B renders).
+  state.skyGlow = q.has('glow') ? q.get('glow') !== '0' : scene.skyGlow !== false;
   state.panels = scene.panels.map((p) => ({ ...p }));
   if (q.get('layout')) { state.layoutId = q.get('layout'); studio.autoFill(); }
   state.selected = scene.selected ?? -1;

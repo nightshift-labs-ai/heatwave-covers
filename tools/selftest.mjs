@@ -99,6 +99,35 @@ try {
   await page.click('#redo-btn');
   const sealGone = !(await page.isChecked('#poster-extras input[data-extra="seal"]'));
   check(withSeal !== noSeal && sealBack && sealGone, 'Seal toggle redraws the preview and is one undo/redo step');
+  // Sky glow engine: no mask on an all-dark photo; a pale sky touching a skin-coloured block never masks the skin.
+  const sky = await page.evaluate(async () => {
+    const m = await import(new URL('./src/engine/sky-glow.js', location.href).href);
+    const ink = await import(new URL('./src/engine/ink.js', location.href).href);
+    const make = (w, h, fn) => {
+      const d = new Uint8ClampedArray(w * h * 4);
+      for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { const c = fn(x, y), i = (y * w + x) * 4; d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2]; d[i + 3] = 255; }
+      return new ImageData(d, w, h);
+    };
+    const dark = make(120, 80, () => [30, 20, 40]);
+    const darkMask = m.skyMaskBeforeGrade(dark, ink.skinMaskBeforeGrade(dark));
+    const scene = make(120, 80, (x, y) => (x > 40 && x < 80 && y > 10 && y < 50 ? [224, 172, 140] : y < 40 ? [236, 228, 214] : [40, 30, 30]));
+    const skin = ink.skinMaskBeforeGrade(scene);
+    const sm = m.skyMaskBeforeGrade(scene, skin);
+    let skinPx = 0, skinMasked = 0;
+    for (let p = 0; p < skin.length; p++) if (skin[p]) { skinPx++; if (sm && sm.mask[p] > 0) skinMasked++; }
+    return { darkEmpty: darkMask === null, coverage: m.skyCoverage(sm), skinPx, skinMasked };
+  });
+  check(sky.darkEmpty, 'sky mask is empty on an all-dark photo');
+  check(sky.skinPx > 0 && sky.skinMasked === 0 && sky.coverage > 0.1, `skin pixels are never in the sky mask (${sky.skinMasked}/${sky.skinPx} skin px masked, sky ${(sky.coverage * 100).toFixed(0)} %)`);
+  // Sky glow toggle: one undo/redo step; left off here so the next page checks the localStorage round trip.
+  const glowDefault = await page.isChecked('#sky-glow');
+  await page.uncheck('#sky-glow');
+  await page.waitForTimeout(300);
+  await page.click('#undo-btn');
+  const glowBack = await page.isChecked('#sky-glow');
+  await page.click('#redo-btn');
+  const glowOff = !(await page.isChecked('#sky-glow'));
+  check(glowDefault && glowBack && glowOff, 'Sky glow is on by default and its toggle is one undo/redo step');
   await page.uncheck('#poster-extras input[data-extra="billing"]');
   await page.fill('#poster-extras input[data-quote]', '"A SLOW BURN" — HARBOR WEEKLY');
   await page.fill('#poster-extras input[data-tag="1"]', 'SALT FLATS · 6 AM');
@@ -119,6 +148,7 @@ try {
   const keptBilling = await one.isChecked('#poster-extras input[data-extra="billing"]');
   const keptSeal = await one.isChecked('#poster-extras input[data-extra="seal"]');
   check(/SLOW BURN/.test(keptQuote) && keptTag === 'SALT FLATS · 6 AM' && !keptBilling && !keptSeal, `poster extras restored from localStorage (${keptQuote} / ${keptTag} / billing ${keptBilling} / seal ${keptSeal})`);
+  check(!(await one.isChecked('#sky-glow')), 'Sky glow off comes back from localStorage');
   const gradeBefore = await one.getAttribute('#grade-swatches button.on', 'data-grade');
   await one.keyboard.press('6');
   await one.keyboard.press('g');

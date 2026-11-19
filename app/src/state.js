@@ -7,6 +7,8 @@ export function createStudioState() {
     layoutId: 'keyArtSlash',
     gradeId: 'sunsetStrip',
     ink: { on: true, strength: 0.8 },
+    // Sky glow: paint each panel's pale sky with the grade's sunset gradient (Sunset Strip, Golden Hour, Neon Night).
+    skyGlow: true,
     caption: {
       title: 'HEATWAVE', subtitle: 'Coastline Nights', tagline: 'IN STORES SOMEWHERE SOON',
       quote: '"HOTTER THAN THE ASPHALT" — THE PALM GAZETTE',
@@ -60,8 +62,8 @@ export function redo(state) {
 const SETTINGS_KEY = 'heatwave-cover-studio/settings-v1';
 
 export function saveStudioSettings(state) {
-  const { layoutId, gradeId, ink, caption, dressing, size } = state;
-  try { localStorage.setItem(SETTINGS_KEY, JSON.stringify({ layoutId, gradeId, ink, caption, dressing, size })); return true; } catch { return false; }
+  const { layoutId, gradeId, ink, skyGlow, caption, dressing, size } = state;
+  try { localStorage.setItem(SETTINGS_KEY, JSON.stringify({ layoutId, gradeId, ink, skyGlow, caption, dressing, size })); return true; } catch { return false; }
 }
 
 // Restores what is valid (known layout and grade ids, one of the export sizes) and ignores the rest.
@@ -72,6 +74,7 @@ export function loadStudioSettings(state, { layouts, grades, sizes }) {
   if (layouts[saved.layoutId]) state.layoutId = saved.layoutId;
   if (grades[saved.gradeId]) state.gradeId = saved.gradeId;
   if (saved.ink && typeof saved.ink.on === 'boolean') state.ink = { on: saved.ink.on, strength: Math.max(0, Math.min(1, +saved.ink.strength || 0.8)) };
+  if (typeof saved.skyGlow === 'boolean') state.skyGlow = saved.skyGlow;
   if (saved.caption) for (const k of ['title', 'subtitle', 'tagline']) if (typeof saved.caption[k] === 'string') state.caption[k] = saved.caption[k].slice(0, 40);
   if (saved.caption && typeof saved.caption.quote === 'string') state.caption.quote = saved.caption.quote.slice(0, 60);
   if (saved.caption && Array.isArray(saved.caption.tags)) state.caption.tags = [0, 1, 2].map((i) => (typeof saved.caption.tags[i] === 'string' ? saved.caption.tags[i].slice(0, 28) : state.caption.tags[i]));
@@ -81,7 +84,7 @@ export function loadStudioSettings(state, { layouts, grades, sizes }) {
 }
 
 function snapshot(s) {
-  return JSON.stringify({ layoutId: s.layoutId, gradeId: s.gradeId, ink: s.ink, caption: s.caption, dressing: s.dressing, size: s.size, panels: s.panels });
+  return JSON.stringify({ layoutId: s.layoutId, gradeId: s.gradeId, ink: s.ink, skyGlow: s.skyGlow, caption: s.caption, dressing: s.dressing, size: s.size, panels: s.panels });
 }
 
 function restore(s, json) {
