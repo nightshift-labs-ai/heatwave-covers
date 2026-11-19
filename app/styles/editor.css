@@ -43,6 +43,8 @@ h2 { font: 600 20px/1 'Teko', sans-serif; letter-spacing: .06em; text-transform:
 #cover-preview.dragging { cursor: grabbing; }
 .drag-pill { position: absolute; pointer-events: none; font: 500 16px/1 'Teko', sans-serif; letter-spacing: .05em; padding: 6px 12px 4px; border-radius: 999px; background: rgba(13, 16, 36, .85); color: #fff; border: 1px solid var(--pink); transform: translate(-50%, -50%); }
 .zoom-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; }
+.zoom-row .history-btns { margin-left: auto; display: flex; gap: 6px; }
+.zoom-row .history-btns .btn:disabled { opacity: .4; cursor: default; }
 .zoom-row .lbl { font: 600 18px 'Teko', sans-serif; color: var(--teal); letter-spacing: .06em; text-transform: uppercase; }
 #crop-zoom { flex: 1; accent-color: var(--pink); }
 

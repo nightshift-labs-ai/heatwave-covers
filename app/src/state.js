@@ -17,10 +17,22 @@ export function createStudioState() {
   };
 }
 
+// Call BEFORE a change: remembers the state as it is now.
 export function pushHistory(state) {
-  state.history.push(snapshot(state));
+  pushSnapshot(state, snapshot(state));
+}
+
+// Call AFTER a change with the snapshot taken before it (the editor keeps the last settled one); equal neighbours
+// are skipped so a no-op click does not cost an undo step.
+export function pushSnapshot(state, json) {
+  if (state.history[state.history.length - 1] === json) return;
+  state.history.push(json);
   if (state.history.length > 60) state.history.shift();
   state.future.length = 0;
+}
+
+export function snapshotState(state) {
+  return snapshot(state);
 }
 
 export function undo(state) {

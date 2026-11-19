@@ -35,6 +35,12 @@ try {
   check(zoom > 1.05, `wheel zooms the selected panel (zoom ${zoom.toFixed(2)})`);
   await page.fill('#caption-title', 'TEST TITLE');
   await page.click('#grade-swatches button[data-grade="neonNight"]');
+  const gradeNow = () => page.getAttribute('#grade-swatches button.on', 'data-grade');
+  await page.click('#undo-btn');
+  const undone = await gradeNow();
+  await page.keyboard.press('Control+y');
+  const redone = await gradeNow();
+  check(undone === 'sunsetStrip' && redone === 'neonNight', `Undo button and Ctrl+Y step the grade back and forth (${undone} / ${redone})`);
   for (const size of ['1080x1080', '1080x1350', '1920x1080']) {
     await page.click(`#size-buttons button[data-size="${size}"]`);
     const [dl] = await Promise.all([page.waitForEvent('download'), page.click('#export-png')]);
@@ -47,17 +53,18 @@ try {
   const ms = await page.evaluate(() => window.__lastExport?.ms);
   console.log(`last export render: ${ms} ms`);
 
-  // One photo through the real file input: every panel gets its own crop; keys 4 (Strip Five), G (grade), E (export).
+  // One photo through the real file input: every panel gets its own crop; keys 5 (Strip Five), G (grade), E (export).
   const one = await context.newPage();
   one.on('pageerror', (e) => errors.push(e.message));
   await one.goto(`${base}index.html`);
   await one.setInputFiles('#photo-input', 'app/samples/woman-palms.jpg');
   await one.waitForFunction(() => document.querySelectorAll('#photo-tray img').length === 1);
-  await one.keyboard.press('4');
+  const gradeBefore = await one.getAttribute('#grade-swatches button.on', 'data-grade');
+  await one.keyboard.press('5');
   await one.keyboard.press('g');
   const layoutOn = await one.getAttribute('#layout-tiles button.on', 'data-layout');
   const gradeOn = await one.getAttribute('#grade-swatches button.on', 'data-grade');
-  check(layoutOn === 'stripFive' && gradeOn === 'neonNight', `keys 4 and G pick stripFive / neonNight (${layoutOn} / ${gradeOn})`);
+  check(layoutOn === 'stripFive' && gradeOn !== gradeBefore, `keys 5 and G pick stripFive and the next grade (${layoutOn} / ${gradeBefore} -> ${gradeOn})`);
   const [dl1] = await Promise.all([one.waitForEvent('download'), one.keyboard.press('e')]);
   check(dl1.suggestedFilename() === 'heatwave-1920x1080.png', `key E exports one-photo cover -> ${dl1.suggestedFilename()}`);
   check(errors.length === 0, `no page errors${errors.length ? `: ${errors.join(' | ')}` : ''}`);

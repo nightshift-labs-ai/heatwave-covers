@@ -7,7 +7,7 @@ import {
   buildSizeButtons, syncSizeButtons, renderPhotoTray,
 } from './editor/controls.js';
 import { renderCover, exportCoverPng, ensureCoverAssets } from './engine/render.js';
-import { createStudioState, pushHistory, undo, redo } from './state.js';
+import { createStudioState, pushHistory, pushSnapshot, snapshotState, undo, redo } from './state.js';
 import { LAYOUT_ORDER } from './engine/layouts.js';
 import { GRADE_ORDER } from './engine/grades.js';
 
@@ -24,6 +24,9 @@ export async function bootHeatwaveStudio() {
   const pill = document.querySelector('.drag-pill');
   const zoom = $('crop-zoom');
   let queued = 0;
+  // `settled`: the state as last drawn (not mid-drag). A change made by a control pushes it, so undo goes back to it.
+  let settled = snapshotState(state);
+  let lastCaptionEdit = 0;
 
   // Live preview: the cover at <= 960 px on its long side, plus the selection overlay and the drag pill.
   function refresh(fast = false) {
@@ -35,6 +38,15 @@ export async function bootHeatwaveStudio() {
     const p = drawSelectionOverlay(ctx, state, w, h);
     placePill(p, w, h);
     syncSteps();
+    if (!fast) settled = snapshotState(state);
+    syncHistoryButtons();
+  }
+  function syncHistoryButtons() {
+    $('undo-btn').disabled = !state.history.length;
+    $('redo-btn').disabled = !state.future.length;
+  }
+  function stepHistory(back) {
+    if (back ? undo(state) : redo(state)) { syncControls(); refresh(); }
   }
   function scheduleRefresh() {
     if (queued) return;
@@ -73,7 +85,11 @@ export async function bootHeatwaveStudio() {
     zoom.disabled = !slot;
   }
   function onChange(kind) {
-    if (kind === 'layout') { pushHistory(state); autoFillPanels(state); state.selected = -1; state.step = Math.max(state.step, 3); }
+    // Typing in a caption field within 1.2 s of the last keystroke stays one undo step.
+    const now = performance.now();
+    if (kind !== 'caption' || now - lastCaptionEdit > 1200) pushSnapshot(state, settled);
+    if (kind === 'caption') lastCaptionEdit = now;
+    if (kind === 'layout') { autoFillPanels(state); state.selected = -1; state.step = Math.max(state.step, 3); }
     if (kind === 'grade' || kind === 'ink' || kind === 'size') state.step = Math.max(state.step, state.photos.length ? 3 : 1);
     syncControls();
     scheduleRefresh();
@@ -145,12 +161,16 @@ export async function bootHeatwaveStudio() {
     syncSteps();
     status.textContent = `Saved ${name} (rendered in ${ms} ms).`;
   });
-  // Keyboard: Ctrl+Z / Ctrl+Shift+Z undo/redo; outside text fields 1-4 pick a layout, G cycles the grade, E exports.
+  // Undo / redo: buttons under the preview, Ctrl+Z, Ctrl+Y or Ctrl+Shift+Z.
+  $('undo-btn').addEventListener('click', () => stepHistory(true));
+  $('redo-btn').addEventListener('click', () => stepHistory(false));
+  // Keyboard: outside text fields 1-5 pick a layout, G cycles the grade, E exports.
   document.addEventListener('keydown', (e) => {
     const key = e.key.toLowerCase();
-    if ((e.ctrlKey || e.metaKey) && key === 'z') {
+    if ((e.ctrlKey || e.metaKey) && (key === 'z' || key === 'y')) {
+      if (e.target.closest('input[type=text]')) return; // the field's own text undo
       e.preventDefault();
-      if (e.shiftKey ? redo(state) : undo(state)) { syncControls(); refresh(); }
+      stepHistory(key === 'z' && !e.shiftKey);
       return;
     }
     if (e.ctrlKey || e.metaKey || e.altKey || e.target.closest('input, textarea')) return;
