@@ -9,6 +9,8 @@
 ## Photos (app/samples/)
 - coupe-desert, couple-pier, lady-motel, man-neon, moto-causeway, pool-neon, speedboat, woman-palms: made with an
   image model (OpenAI image generation) for this entry's operator. They show fictional people.
+- supercar-boulevard, motel-rain, flamingo-boardwalk, marina-skyline, pier-fisher (added in M2): made with an image
+  model (OpenAI image generation), fictional people.
 - boulevard.jpg and pier.jpg: make.fun's own sample photos from the kit starter, made for make.fun with an image model
   and free to use.
 

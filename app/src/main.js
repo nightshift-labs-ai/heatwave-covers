@@ -11,7 +11,10 @@ import { createStudioState, pushHistory, undo, redo } from './state.js';
 import { LAYOUT_ORDER } from './engine/layouts.js';
 import { GRADE_ORDER } from './engine/grades.js';
 
-const SAMPLE_PHOTOS = ['woman-palms', 'lady-motel', 'man-neon', 'pool-neon', 'coupe-desert', 'speedboat', 'moto-causeway', 'couple-pier', 'boulevard', 'pier'];
+const SAMPLE_PHOTOS = [
+  'supercar-boulevard', 'woman-palms', 'lady-motel', 'man-neon', 'motel-rain', 'flamingo-boardwalk', 'pier-fisher',
+  'marina-skyline', 'pool-neon', 'coupe-desert', 'speedboat', 'moto-causeway', 'couple-pier', 'boulevard', 'pier',
+];
 
 export async function bootHeatwaveStudio() {
   const state = createStudioState();
