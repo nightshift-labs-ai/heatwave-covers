@@ -6,15 +6,16 @@ import { pushHistory } from '../state.js';
 
 const SCENES = {
   // Shot 1: 1920 x 1080, Key Art Slash, Sunset Strip, Poster Ink on, six distinct photos: the hero face, the
-  // supercar in the second-largest panel, a face, a sunset sky, the speedboat and the motorbike.
+  // supercar in the second-largest panel, a sunset sky (under the title's end), a second face in the free middle-right
+  // panel, the speedboat and the motorbike.
   'cover-keyart': {
     layoutId: 'keyArtSlash', gradeId: 'sunsetStrip', size: [1920, 1080],
     caption: { title: 'HEATWAVE', subtitle: 'Coastline Nights', tagline: 'ONE COASTLINE · SIX STORIES · NO CURFEW' },
-    photos: ['woman-palms', 'supercar-boulevard', 'man-neon', 'coupe-desert', 'speedboat', 'moto-causeway'],
+    photos: ['woman-palms', 'supercar-boulevard', 'coupe-desert', 'man-neon', 'speedboat', 'moto-causeway'],
     panels: [
       { photo: 0, zoom: 1, fx: 0.5, fy: 0.3 },
       { photo: 1, zoom: 1.05, fx: 0.52, fy: 0.5 },
-      { photo: 2, zoom: 1.15, fx: 0.55, fy: 0.32 }, { photo: 3, zoom: 1.1, fx: 0.5, fy: 0.4 },
+      { photo: 2, zoom: 1.1, fx: 0.5, fy: 0.36 }, { photo: 3, zoom: 1.25, fx: 0.55, fy: 0.3 },
       { photo: 4, zoom: 1.2, fx: 0.5, fy: 0.55 }, { photo: 5, zoom: 1.1, fx: 0.5, fy: 0.45 },
     ],
   },

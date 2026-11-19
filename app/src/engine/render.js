@@ -143,7 +143,7 @@ function panelArt(photo, slot, pw, ph, state, W, i, fast) {
   const skin = ink ? skinMaskBeforeGrade(data) : null;
   const lumHalf = ink ? smoothForInk(data, W) : null;
   autoLevelsBeforeGrade(data);
-  applyGradeToPanel(data, state.gradeId);
+  applyGradeToPanel(data, state.gradeId, { keepHighlights: ink ? 0.7 : 0 });
   if (ink) posterInk(data, lumHalf, { coverW: W, strength: state.ink.strength, paper: gradeColorAt(state.gradeId, 0.5), seed: 17 + i * 101, skin });
   else liftToMeanLuminance(data, 0.44);
   grainAndVignette(data, 911 + i * 37);

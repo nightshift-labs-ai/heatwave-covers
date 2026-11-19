@@ -33,14 +33,20 @@ export const GRADES = {
 export const GRADE_ORDER = ['sunsetStrip', 'neonNight', 'goldenHour', 'miamiTeal', 'noirHeat'];
 
 // Grade the pixels of one panel in place.
-export function applyGradeToPanel(imageData, gradeId) {
+// keepHighlights (0..1, Poster Ink uses 0.7): blend the gradient map less in the highlights, so each photo's own
+// sunset sky keeps its orange and pink instead of taking the map's single highlight colour.
+export function applyGradeToPanel(imageData, gradeId, { keepHighlights = 0 } = {}) {
   const grade = GRADES[gradeId] ?? GRADES.sunsetStrip;
   const lut = gradeLut(gradeId, grade);
   const d = imageData.data;
-  const m = grade.mix, k = 1 - m;
+  const mixAt = new Float32Array(256);
+  for (let y = 0; y < 256; y++) {
+    const t = Math.max(0, Math.min(1, (y / 255 - 0.5) / 0.4));
+    mixAt[y] = grade.mix * (1 - keepHighlights * t * t * (3 - 2 * t));
+  }
   for (let i = 0; i < d.length; i += 4) {
     const y = (d[i] * 54 + d[i + 1] * 183 + d[i + 2] * 19) >> 8;
-    const j = y * 3;
+    const j = y * 3, m = mixAt[y], k = 1 - m;
     d[i] = d[i] * k + lut[j] * m;
     d[i + 1] = d[i + 1] * k + lut[j + 1] * m;
     d[i + 2] = d[i + 2] * k + lut[j + 2] * m;

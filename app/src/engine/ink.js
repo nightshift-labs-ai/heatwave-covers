@@ -7,19 +7,79 @@ const INK = [18, 10, 28]; // #120a1c
 // Full Poster Ink pass on one graded panel. lumHalf comes from smoothForInk(), taken before the grade; skin comes from
 // skinMaskBeforeGrade() (1 = skin-coloured pixel), so faces get lighter lines and no dots.
 // Ink weight follows the panel: a 200 px strip gets 1 px lines and fewer of them, a hero panel the full W/640 weight.
+// M3 painterly pass: no posterize bands and no lift to a mean luminance. An edge-preserving Kuwahara filter paints
+// flat strokes but keeps faces continuous-tone, an S-curve keeps deep blacks and lets hot highlights clip to warm
+// cream, halftone dots only in deep non-skin shadows, and ink lines are heavy on silhouettes, light on detail.
 export function posterInk(imageData, lumHalf, { coverW, strength = 0.8, paper = [200, 80, 120], seed = 1, skin = null }) {
   const s = Math.max(0, Math.min(1, strength));
   if (s <= 0) return imageData;
   const short = Math.min(imageData.width, imageData.height);
   const sizeK = Math.max(0, Math.min(1, (short - 160) / 440)); // 0 for a small strip, 1 for a hero panel
-  posterize(imageData, 5, s);
-  liftToMeanLuminance(imageData, 0.47);
-  halftoneShadows(imageData, { cell: Math.max(4, Math.round(coverW / 150)), paper, strength: s, skin });
+  kuwahara(imageData, Math.max(2, Math.round((coverW / 420) * (0.6 + 0.4 * sizeK) * s)));
+  posterCurve(imageData, s);
+  halftoneShadows(imageData, { cell: Math.max(4, Math.round(coverW / 170)), paper, strength: s, skin, cutoffL: 0.14, paperA: 0.06 });
   sobelInkLines(imageData, lumHalf, {
     lineWidth: Math.max(1, Math.round((coverW / 640) * (0.5 + 0.5 * sizeK))),
-    alpha: 0.85 * s, keep: 0.08 + 0.04 * sizeK, skin,
+    alpha: 0.9 * s, keep: 0.07 + 0.04 * sizeK, skin, graded: true,
   });
   return imageData;
+}
+
+// Kuwahara filter on summed-area tables: each pixel takes the mean colour of the least-varied of its four
+// (r+1)x(r+1) quadrants. Flat areas become painted strokes; edges stay sharp; skin stays smooth (no bands).
+export function kuwahara(imageData, r) {
+  const { width: w, height: h, data: d } = imageData;
+  const W1 = w + 1;
+  const sR = new Float64Array(W1 * (h + 1)), sG = new Float64Array(W1 * (h + 1)), sB = new Float64Array(W1 * (h + 1));
+  const sL = new Float64Array(W1 * (h + 1)), sQ = new Float64Array(W1 * (h + 1));
+  for (let y = 0; y < h; y++) {
+    let aR = 0, aG = 0, aB = 0, aL = 0, aQ = 0;
+    for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * 4, l = lum(d, i);
+      aR += d[i]; aG += d[i + 1]; aB += d[i + 2]; aL += l; aQ += l * l;
+      const o = (y + 1) * W1 + x + 1, u = y * W1 + x + 1;
+      sR[o] = sR[u] + aR; sG[o] = sG[u] + aG; sB[o] = sB[u] + aB; sL[o] = sL[u] + aL; sQ[o] = sQ[u] + aQ;
+    }
+  }
+  const box = (S, x0, y0, x1, y1) => S[y1 * W1 + x1] - S[y0 * W1 + x1] - S[y1 * W1 + x0] + S[y0 * W1 + x0];
+  const out = new Uint8ClampedArray(d.length);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      let best = Infinity, bx0 = 0, by0 = 0, bx1 = 1, by1 = 1;
+      for (let q = 0; q < 4; q++) {
+        const x0 = Math.max(0, q & 1 ? x : x - r), x1 = Math.min(w, (q & 1 ? x + r : x) + 1);
+        const y0 = Math.max(0, q & 2 ? y : y - r), y1 = Math.min(h, (q & 2 ? y + r : y) + 1);
+        const n = (x1 - x0) * (y1 - y0), m = box(sL, x0, y0, x1, y1) / n;
+        const v = box(sQ, x0, y0, x1, y1) / n - m * m;
+        if (v < best) { best = v; bx0 = x0; by0 = y0; bx1 = x1; by1 = y1; }
+      }
+      const n = (bx1 - bx0) * (by1 - by0), i = (y * w + x) * 4;
+      out[i] = box(sR, bx0, by0, bx1, by1) / n; out[i + 1] = box(sG, bx0, by0, bx1, by1) / n; out[i + 2] = box(sB, bx0, by0, bx1, by1) / n;
+      out[i + 3] = d[i + 3];
+    }
+  }
+  d.set(out);
+  return imageData;
+}
+
+// Poster contrast: an S-curve on luminance (hue kept), deep blacks stay black, and the hottest highlights clip
+// towards warm cream so a sunset sky glows instead of turning mauve.
+function posterCurve(imageData, s) {
+  const d = imageData.data;
+  const gain = new Float32Array(256);
+  const k = 1 + 0.5 * s;
+  for (let v = 1; v < 256; v++) {
+    const x = v / 255;
+    const y = x < 0.46 ? 0.46 * Math.pow(x / 0.46, k) : 1 - 0.54 * Math.pow((1 - x) / 0.54, k * 0.85);
+    gain[v] = (y * 255) / v;
+  }
+  for (let i = 0; i < d.length; i += 4) {
+    const l = lum(d, i) | 0, g = gain[Math.min(255, l)] || 1;
+    let r = d[i] * g, gg = d[i + 1] * g, b = d[i + 2] * g;
+    const t = (l * g - 205) / 50;
+    if (t > 0) { const a = Math.min(1, t) * 0.7; r += (255 - r) * a; gg += (242 - gg) * a; b += (214 - b) * a; }
+    d[i] = r; d[i + 1] = gg; d[i + 2] = b;
+  }
 }
 
 // Skin mask from the crop before the grade (a classic RGB skin-tone rule, per pixel). The grade recolours
@@ -37,9 +97,9 @@ export function skinMaskBeforeGrade(imageData) {
 
 // Halftone dots only in the deep shadows (darker than 0.22, never on skin): shadows become dot screens on a lightly
 // lifted "paper" tone, mid-tones stay flat colour.
-export function halftoneShadows(imageData, { cell, paper, strength, skin = null }) {
+export function halftoneShadows(imageData, { cell, paper, strength, skin = null, cutoffL = 0.22, paperA = 0.22 }) {
   const { width: w, height: h, data: d } = imageData;
-  const cutoff = 0.22 * 255;
+  const cutoff = cutoffL * 255;
   for (let cy = 0; cy < h; cy += cell) {
     for (let cx = 0; cx < w; cx += cell) {
       const x1 = Math.min(w, cx + cell), y1 = Math.min(h, cy + cell);
@@ -57,7 +117,7 @@ export function halftoneShadows(imageData, { cell, paper, strength, skin = null 
           const dx = x + 0.5 - mx, dy = y + 0.5 - my;
           const inDot = dx * dx + dy * dy <= r2;
           const target = inDot ? INK : paper;
-          const a = (inDot ? 0.75 : 0.22) * strength;
+          const a = (inDot ? 0.75 : paperA) * strength;
           d[i] += (target[0] - d[i]) * a; d[i + 1] += (target[1] - d[i + 1]) * a; d[i + 2] += (target[2] - d[i + 2]) * a;
         }
       }
@@ -68,7 +128,7 @@ export function halftoneShadows(imageData, { cell, paper, strength, skin = null 
 
 // Ink lines: Sobel magnitude on a half-size luminance copy, keep the strongest 8-12 % (fewer in small panels),
 // dilate, draw in #120a1c; on skin the line is drawn at 40 % so faces read as faces, not as cracks.
-export function sobelInkLines(imageData, lumHalf, { lineWidth, alpha, keep = 0.12, skin = null }) {
+export function sobelInkLines(imageData, lumHalf, { lineWidth, alpha, keep = 0.12, skin = null, graded = false }) {
   const { width: w, height: h, data: d } = imageData;
   const { w: hw, h: hh } = lumHalf;
   const L = smooth3(lumHalf.lum, hw, hh);
@@ -98,10 +158,16 @@ export function sobelInkLines(imageData, lumHalf, { lineWidth, alpha, keep = 0.1
   }
   const r = Math.max(0, Math.floor((lineWidth - 1) / 2));
   if (r > 0) mask = dilate(mask, w, h, r);
-  for (let p = 0, i = 0; p < mask.length; p++, i += 4) {
+  for (let y = 0, p = 0, i = 0; y < h; y++) {
+    const sy = Math.min(hh - 1, y >> 1);
+    for (let x = 0; x < w; x++, p++, i += 4) {
     if (!mask[p]) continue;
-    const a = skin && skin[p] ? alpha * 0.4 : alpha;
+    // graded: silhouettes and big shapes (strong edges) get full ink, interior detail (weaker kept edges) lighter.
+    const m = graded ? mag[sy * hw + Math.min(hw - 1, x >> 1)] : 0;
+    const wgt = graded ? (m > thr ? Math.min(1, 0.4 + (0.6 * (m - thr)) / (thr * 1.2)) : 0.6) : 1;
+    const a = (skin && skin[p] ? alpha * (graded ? 0.3 : 0.4) : alpha) * wgt;
     d[i] += (INK[0] - d[i]) * a; d[i + 1] += (INK[1] - d[i + 1]) * a; d[i + 2] += (INK[2] - d[i + 2]) * a;
+    }
   }
   return imageData;
 }
