@@ -2,9 +2,9 @@
 // so what you see is what you export. Each panel: crop -> (Poster Ink smoothing) -> grade -> Poster Ink -> grain.
 
 import { layoutFor } from './layouts.js';
-import { applyGradeToPanel, gradeColorAt } from './grades.js';
+import { applyGradeToPanel, gradeColorAt, autoLevelsBeforeGrade } from './grades.js';
 import { posterInk, smoothForInk, grainAndVignette, liftToMeanLuminance } from './ink.js';
-import { drawTitleBlock, drawHalftoneSun } from './lettering.js';
+import { drawTitleBlock, drawHalftoneSun, drawStickerBadge } from './lettering.js';
 
 // Draw the whole cover for `state` into ctx at W x H. opts.fastPanel: index of a panel being dragged (drawn with
 // grade only, no ink, until the drag ends).
@@ -23,6 +23,10 @@ export function renderCover(state, W, H, ctx, opts = {}) {
   drawTitleBlock(ctx, geo.title, state.caption, {
     W, H, gradeId: state.gradeId, background: geo.kind === 'snapshots' ? 'none' : geo.overlay ? 'overlay' : 'band',
   });
+  if (state.badge !== false && geo.kind === 'grid' && !geo.overlay && geo.panels[0]) {
+    const p = geo.panels[0], r = Math.round(Math.min(W, H) * 0.085);
+    drawStickerBadge(ctx, p.x + r * 1.15, p.y + r * 1.15, r, 'NEW', 'SUMMER 2026');
+  }
   ctx.restore();
   return geo;
 }
@@ -93,6 +97,7 @@ function panelArt(photo, slot, pw, ph, state, W, i, fast) {
   drawCrop(cctx, photo, slot, pw, ph);
   const data = cctx.getImageData(0, 0, pw, ph);
   const lumHalf = ink ? smoothForInk(data, W) : null;
+  autoLevelsBeforeGrade(data);
   applyGradeToPanel(data, state.gradeId);
   if (ink) posterInk(data, lumHalf, { coverW: W, strength: state.ink.strength, paper: gradeColorAt(state.gradeId, 0.5), seed: 17 + i * 101 });
   else liftToMeanLuminance(data, 0.44);

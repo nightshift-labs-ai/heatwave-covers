@@ -10,10 +10,11 @@ const SCENES = {
     caption: { title: 'HEATWAVE', subtitle: 'Coastline Nights', tagline: 'IN STORES SOMEWHERE SOON' },
     photos: ['woman-palms', 'lady-motel', 'man-neon', 'pool-neon', 'coupe-desert', 'speedboat', 'moto-causeway', 'couple-pier'],
     panels: [
+      // hero, then the small wide column (bright scenes + one close-up), the tall row (portraits), the big right panel
       { photo: 0, zoom: 1, fx: 0.5, fy: 0.3 },
-      { photo: 1, zoom: 1, fx: 0.5, fy: 0.3 }, { photo: 2, zoom: 1, fx: 0.5, fy: 0.35 }, { photo: 3, zoom: 1, fx: 0.5, fy: 0.4 },
-      { photo: 4, zoom: 1, fx: 0.5, fy: 0.35 }, { photo: 5, zoom: 1, fx: 0.5, fy: 0.35 }, { photo: 6, zoom: 1, fx: 0.5, fy: 0.35 }, { photo: 7, zoom: 1, fx: 0.5, fy: 0.35 },
-      { photo: 2, zoom: 1.4, fx: 0.55, fy: 0.35 },
+      { photo: 4, zoom: 1.1, fx: 0.5, fy: 0.45 }, { photo: 0, zoom: 2.1, fx: 0.44, fy: 0.27 }, { photo: 5, zoom: 1.1, fx: 0.5, fy: 0.45 },
+      { photo: 1, zoom: 1, fx: 0.5, fy: 0.3 }, { photo: 3, zoom: 1.15, fx: 0.45, fy: 0.36 }, { photo: 6, zoom: 1, fx: 0.5, fy: 0.4 }, { photo: 7, zoom: 1.1, fx: 0.5, fy: 0.35 },
+      { photo: 2, zoom: 1.1, fx: 0.55, fy: 0.35 },
     ],
   },
   // Shot 3: 1080 x 1350, tilted snapshots over a neon sky.

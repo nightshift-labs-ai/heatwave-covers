@@ -42,6 +42,25 @@ export function applyGradeToPanel(imageData, gradeId) {
   return imageData;
 }
 
+// Stretch the panel's luminance range (1st..99th percentile) to full before the grade, so night photos use the
+// whole gradient map instead of collapsing into one tone. Gain is capped at 2.4.
+export function autoLevelsBeforeGrade(imageData) {
+  const d = imageData.data;
+  const hist = new Uint32Array(256);
+  let n = 0;
+  for (let i = 0; i < d.length; i += 8) { hist[(d[i] * 54 + d[i + 1] * 183 + d[i + 2] * 19) >> 8]++; n++; }
+  let lo = 0, hi = 255, acc = 0;
+  for (let v = 0; v < 256; v++) { acc += hist[v]; if (acc >= n * 0.01) { lo = v; break; } }
+  acc = 0;
+  for (let v = 255; v >= 0; v--) { acc += hist[v]; if (acc >= n * 0.01) { hi = v; break; } }
+  const gain = Math.min(2.4, 255 / Math.max(1, hi - lo));
+  if (gain < 1.05) return imageData;
+  for (let i = 0; i < d.length; i += 4) {
+    d[i] = (d[i] - lo) * gain; d[i + 1] = (d[i + 1] - lo) * gain; d[i + 2] = (d[i + 2] - lo) * gain;
+  }
+  return imageData;
+}
+
 // Sample a grade's gradient at t (0..1) as [r, g, b]; used for swatches, halftone paper and title bands.
 export function gradeColorAt(gradeId, t) {
   const grade = GRADES[gradeId] ?? GRADES.sunsetStrip;

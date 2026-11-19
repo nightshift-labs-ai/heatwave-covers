@@ -111,6 +111,42 @@ function drawTaglineRibbon(ctx, text, cx, baseline, size, maxW) {
   ctx.restore();
 }
 
+// Round starburst sticker: gold burst, dark outline, a big word and a small line under it, tilted like a price tag.
+export function drawStickerBadge(ctx, cx, cy, r, big, small) {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(-0.21);
+  ctx.beginPath();
+  for (let k = 0; k < 40; k++) {
+    const a = (k / 40) * Math.PI * 2, rr = k % 2 ? r * 0.88 : r;
+    ctx.lineTo(Math.cos(a) * rr, Math.sin(a) * rr);
+  }
+  ctx.closePath();
+  ctx.fillStyle = OUTLINE;
+  ctx.translate(r * 0.07, r * 0.07);
+  ctx.fill();
+  ctx.translate(-r * 0.07, -r * 0.07);
+  ctx.fillStyle = '#ffd23f';
+  ctx.strokeStyle = OUTLINE;
+  ctx.lineWidth = r * 0.07;
+  ctx.lineJoin = 'round';
+  ctx.fill();
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(0, 0, r * 0.72, 0, Math.PI * 2);
+  ctx.strokeStyle = '#ff2e88';
+  ctx.lineWidth = r * 0.05;
+  ctx.stroke();
+  ctx.fillStyle = OUTLINE;
+  ctx.textAlign = 'center';
+  ctx.font = `400 ${Math.round(r * 0.62)}px Anton`;
+  ctx.fillText(big, 0, r * 0.12);
+  ctx.font = `600 ${Math.round(r * 0.26)}px Teko`;
+  ctx.fillStyle = '#c2185b';
+  ctx.fillText(small, 0, r * 0.42);
+  ctx.restore();
+}
+
 // Sunset band: deep purple sky to a hot horizon, a striped halftone sun disc behind the lettering.
 export function drawSunsetBand(ctx, r, gradeId) {
   ctx.save();
