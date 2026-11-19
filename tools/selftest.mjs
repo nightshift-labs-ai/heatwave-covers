@@ -90,6 +90,13 @@ try {
   const layoutOn = await one.getAttribute('#layout-tiles button.on', 'data-layout');
   const gradeOn = await one.getAttribute('#grade-swatches button.on', 'data-grade');
   check(layoutOn === 'stripFive' && gradeOn !== gradeBefore, `keys 5 and G pick stripFive and the next grade (${layoutOn} / ${gradeBefore} -> ${gradeOn})`);
+  // Double-click the title on the preview (Strip Five puts it across the middle), type, Enter.
+  const pb = await one.locator('#cover-preview').boundingBox();
+  await one.mouse.dblclick(pb.x + pb.width / 2, pb.y + pb.height / 2);
+  const opened = await one.locator('.title-inline-edit').count();
+  if (opened) { await one.fill('.title-inline-edit', 'night drive'); await one.keyboard.press('Enter'); }
+  const titleNow = await one.inputValue('#caption-title');
+  check(opened === 1 && titleNow === 'NIGHT DRIVE', `double-click the title edits it in place (${titleNow})`);
   const [dl1] = await Promise.all([one.waitForEvent('download'), one.keyboard.press('e')]);
   check(dl1.suggestedFilename() === 'heatwave-1920x1080.png', `key E exports one-photo cover -> ${dl1.suggestedFilename()}`);
   check(errors.length === 0, `no page errors${errors.length ? `: ${errors.join(' | ')}` : ''}`);

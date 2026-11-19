@@ -2,6 +2,7 @@
 // caption / size controls, Export PNG) and keeps the 3-step strip lit as you go.
 import { loadPhotoFiles, loadPhotoUrl, autoFillPanels } from './photos.js';
 import { bindPreviewPointer, drawSelectionOverlay, zoomPanel, hitTestPanel } from './editor/panels.js';
+import { bindTitleDoubleClickEdit } from './editor/title-edit.js';
 import {
   buildLayoutTiles, syncLayoutTiles, buildGradeSwatches, syncGradeSwatches, bindInkControls, bindCaptionFields,
   buildSizeButtons, syncSizeButtons, renderPhotoTray,
@@ -164,6 +165,15 @@ export async function bootHeatwaveStudio() {
   });
   document.querySelector('.btn-autofill').addEventListener('click', () => { pushHistory(state); autoFillPanels(state); syncControls(); refresh(); });
 
+  // Double-click the title on the preview: edit it in place (one undo step).
+  bindTitleDoubleClickEdit(canvas, state, {
+    commit: (title) => {
+      pushSnapshot(state, settled);
+      state.caption.title = title;
+      syncControls(); refresh();
+      status.textContent = `Title set to “${title}”.`;
+    },
+  });
   // Panel crop: drag / wheel on the preview, slider and +- buttons under it.
   bindPreviewPointer(canvas, state, { refresh, commit: () => pushHistory(state), changed: syncZoom });
   zoom.addEventListener('input', () => { zoomPanel(state, state.selected, +zoom.value); refresh(true); });

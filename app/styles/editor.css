@@ -31,6 +31,7 @@ h2 { font: 600 20px/1 'Teko', sans-serif; letter-spacing: .06em; text-transform:
 .btn-mini { display: inline-block; width: auto; margin: 0; padding: 6px 10px; font-size: 16px; }
 .btn-export { margin-top: 12px; padding: 13px; font-size: 24px; background: var(--pink); box-shadow: 0 6px 22px rgba(255, 46, 136, .45); }
 .btn-export:hover, .btn-add:hover { filter: brightness(1.1); }
+.title-inline-edit { position: absolute; z-index: 5; box-sizing: border-box; padding: 0 10px; text-align: center; font-family: 'Anton', sans-serif; letter-spacing: .02em; color: #ffd23f; background: rgba(13, 16, 36, .92); border: 3px solid var(--pink); border-radius: 8px; box-shadow: 0 0 22px rgba(255, 46, 136, .6); outline: none; }
 .btn-export-all { margin-top: 6px; padding: 6px; font-size: 17px; }
 .drop-zone { border: 2px dashed #3a4278; border-radius: 10px; padding: 10px; text-align: center; color: var(--dim); font-size: 12px; margin: 8px 0; }
 .drop-zone.over { border-color: var(--teal); color: var(--teal); }
