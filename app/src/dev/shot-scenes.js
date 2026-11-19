@@ -19,35 +19,46 @@ const SCENES = {
       { photo: 4, zoom: 1.2, fx: 0.5, fy: 0.55 }, { photo: 5, zoom: 1.1, fx: 0.5, fy: 0.45 },
     ],
   },
-  // Shot 3: 1080 x 1350, tilted snapshots over a neon sky.
+  // Shot 3: 1080 x 1350, Key Art Slash in Neon Night: the couple on the pier as the hero, the fisher and the neon man
+  // as the two faces in the middle row, the marina skyline, the neon pool and the rainy motel along the bottom.
   'cover-tall': {
-    layoutId: 'tiltedSnapshots', gradeId: 'neonNight', size: [1080, 1350],
-    caption: { title: 'SALT & SIRENS', subtitle: 'Harbor Run', tagline: 'ONE NIGHT ON THE WATERFRONT' },
-    photos: ['couple-pier', 'marina-skyline', 'pool-neon', 'man-neon', 'motel-rain'],
+    layoutId: 'keyArtSlash', gradeId: 'neonNight', size: [1080, 1350],
+    caption: {
+      title: 'SALT & SIRENS', subtitle: 'Harbor Run', tagline: 'ONE NIGHT ON THE WATERFRONT',
+      quote: '"LOUD, SALTY AND GORGEOUS" — BAYSIDE BEAT', tags: ['THE SWEETHEARTS', 'DOCK NINE · 2 AM', 'THE NIGHT MANAGER'],
+    },
+    photos: ['couple-pier', 'pier-fisher', 'man-neon', 'marina-skyline', 'pool-neon', 'motel-rain'],
     panels: [
-      { photo: 0, zoom: 1, fx: 0.5, fy: 0.38 }, { photo: 1, zoom: 1, fx: 0.5, fy: 0.4 },
-      { photo: 2, zoom: 1, fx: 0.5, fy: 0.4 }, { photo: 3, zoom: 1.1, fx: 0.5, fy: 0.35 }, { photo: 4, zoom: 1, fx: 0.5, fy: 0.3 },
+      { photo: 0, zoom: 1.15, fx: 0.5, fy: 0.36 }, { photo: 1, zoom: 1.3, fx: 0.4, fy: 0.36 }, { photo: 2, zoom: 1.3, fx: 0.55, fy: 0.3 },
+      { photo: 3, zoom: 1.1, fx: 0.5, fy: 0.45 }, { photo: 4, zoom: 1.1, fx: 0.5, fy: 0.45 }, { photo: 5, zoom: 1.1, fx: 0.5, fy: 0.4 },
     ],
   },
-  // Shot 4: 1080 x 1080 from ONE photo, four crops in Grid Four (face, ferris wheel, arcade, shirt), Miami Teal.
+  // Shot 4: 1080 x 1080 from ONE photo: Key Art Slash's hero and four slanted panels, each its own crop of the same
+  // face photo (full figure, face close-up, hands, the sign behind), in warm Golden Hour.
   'cover-one': {
-    layoutId: 'gridFour', gradeId: 'miamiTeal', size: [1080, 1080],
-    caption: { title: 'BOARDWALK', subtitle: 'One Photo, Four Shots', tagline: 'FOUR CROPS · ONE SNAPSHOT' },
-    photos: ['flamingo-boardwalk'],
+    layoutId: 'keyArtSlash', gradeId: 'goldenHour', size: [1080, 1080],
+    caption: {
+      title: 'MOTEL MIRAGE', subtitle: 'One Photo, Five Shots', tagline: 'FIVE CROPS · ONE SNAPSHOT',
+      quote: '"ONE FACE, FIVE ALIBIS" — THE DUNE DISPATCH', tags: ['THE GUEST', 'ROOM 12 · CHECK-OUT NOON', 'THE REGULAR'],
+    },
+    photos: ['lady-motel'],
     panels: [
-      { photo: 0, zoom: 1.6, fx: 0.56, fy: 0.24 }, { photo: 0, zoom: 1.7, fx: 0.86, fy: 0.32 },
-      { photo: 0, zoom: 1.5, fx: 0.12, fy: 0.5 }, { photo: 0, zoom: 2.3, fx: 0.47, fy: 0.62 },
+      { photo: 0, zoom: 1, fx: 0.5, fy: 0.3 }, { photo: 0, zoom: 2.6, fx: 0.52, fy: 0.12 }, { photo: 0, zoom: 2.2, fx: 0.4, fy: 0.3 },
+      { photo: 0, zoom: 2.2, fx: 0.88, fy: 0.16 }, { photo: 0, zoom: 2.4, fx: 0.62, fy: 0.12 },
     ],
   },
-  // Shot 2: the editor with photos in the tray, Hero + Four (supercar hero, four framed photos), Poster Ink on,
-  // one framed panel selected, step 3 lit.
+  // Shot 2: the editor at 1280 x 800 with Key Art Slash in the preview (the supercar as the hero this time), Poster
+  // Ink on, the Poster extras toggles and the quote / tag fields filled in, the hero selected, Undo live.
   editor: {
-    layoutId: 'heroFour', gradeId: 'sunsetStrip', size: [1920, 1080], selected: 0, editor: true,
-    caption: { title: 'SALT & SIRENS', subtitle: 'Harbor Run', tagline: 'EVERY STREET HAS A PRICE' },
-    photos: ['supercar-boulevard', 'woman-palms', 'pier-fisher', 'couple-pier', 'lady-motel', 'coupe-desert', 'speedboat', 'moto-causeway'],
+    layoutId: 'keyArtSlash', gradeId: 'sunsetStrip', size: [1920, 1080], selected: 0, editor: true,
+    caption: {
+      title: 'NIGHT DRIVE', subtitle: 'Desert Highway', tagline: 'EVERY STREET HAS A PRICE',
+      quote: '"FAST, WARM AND RECKLESS" — THE MIRAGE TIMES', tags: ['THE DRIVER', 'ROUTE 9 · 11 PM', 'THE LOOKOUT'],
+    },
+    photos: ['supercar-boulevard', 'woman-palms', 'coupe-desert', 'speedboat', 'moto-causeway', 'flamingo-boardwalk'],
     panels: [
-      { photo: 0, zoom: 1.05, fx: 0.5, fy: 0.55 }, { photo: 1, zoom: 1.15, fx: 0.5, fy: 0.3 }, { photo: 2, zoom: 1.35, fx: 0.33, fy: 0.36 },
-      { photo: 3, zoom: 1.1, fx: 0.5, fy: 0.35 }, { photo: 4, zoom: 1.7, fx: 0.6, fy: 0.24 },
+      { photo: 0, zoom: 1.1, fx: 0.42, fy: 0.55 }, { photo: 1, zoom: 1.2, fx: 0.5, fy: 0.28 }, { photo: 2, zoom: 1.1, fx: 0.5, fy: 0.4 },
+      { photo: 5, zoom: 1.5, fx: 0.56, fy: 0.26 }, { photo: 3, zoom: 1.2, fx: 0.5, fy: 0.55 }, { photo: 4, zoom: 1.1, fx: 0.5, fy: 0.45 },
     ],
   },
 };
@@ -60,7 +71,9 @@ export async function runShotScene(name, studio) {
   state.layoutId = scene.layoutId;
   state.gradeId = scene.gradeId;
   state.ink = { on: true, strength: 0.8 };
-  state.caption = { ...scene.caption };
+  // Scenes without a quote or tags keep the studio's defaults (the same words the engine falls back to).
+  state.caption = { ...state.caption, ...scene.caption };
+  if (scene.dressing) state.dressing = { ...state.dressing, ...scene.dressing };
   state.size = { w: scene.size[0], h: scene.size[1] };
   // Trial renders: &layout=<id>&grade=<id>&size=WxH override the scene (crops are re-filled if the layout changes).
   const q = new URLSearchParams(location.search);
