@@ -34,7 +34,7 @@ const SCENES = {
     photos: ['woman-palms'],
     panels: [
       { photo: 0, zoom: 1, fx: 0.1, fy: 0.5 }, { photo: 0, zoom: 1.3, fx: 0.36, fy: 0.32 }, { photo: 0, zoom: 1.0, fx: 0.47, fy: 0.3 },
-      { photo: 0, zoom: 2.2, fx: 0.47, fy: 0.24 }, { photo: 0, zoom: 1, fx: 0.9, fy: 0.5 },
+      { photo: 0, zoom: 2.2, fx: 0.5, fy: 0.32 }, { photo: 0, zoom: 1, fx: 0.9, fy: 0.5 },
     ],
   },
   // Shot 2: the editor with the samples in the tray, Hero + Six, one panel selected, step 3 lit.

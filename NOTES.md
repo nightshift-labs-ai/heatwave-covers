@@ -19,12 +19,12 @@
 
 ## Numbers (headless Chromium, this machine)
 - First (uncached) 1920x1080 keyArtNine render with Poster Ink: 185-227 ms. A cached re-render for export takes about 5 ms. A 1080x1350 snapshots cover takes about 70 ms and a 1080x1080 strip about 120 ms.
-- Shots: 1-cover-1920.jpg 1280x720 209.6 KiB (budget 230), 2-editor.jpg 1280x800 159.3 KiB, 3-cover-1080x1350.jpg 864x1080 164.8 KiB, 4-cover-1080.jpg 960x960 166.7 KiB (budget 170 each).
+- Shots: 1-cover-1920.jpg 1280x720 209.6 KiB (budget 230), 2-editor.jpg 1280x800 159.3 KiB, 3-cover-1080x1350.jpg 864x1080 164.8 KiB, 4-cover-1080.jpg 960x960 165.8 KiB (budget 170 each).
 - dossier.json: 1,029,891 bytes, byte-identical across two runs. Kit `check`: 4 passed, 0 failed.
 
 ## Known issues / bugs
 - Night photos with low luminance contrast (pool-neon) can still go flat under sunsetStrip when they sit in very small panels. In shot 1 such photos go in the tall row slots, not the small wide column.
-- Snapshot hit-testing uses the rotated frame, but the selection pill is placed on the unrotated centre.
+- The drop-zone highlight can flicker during a drag, because `dragleave` fires on child elements.
 - Changing the layout re-runs auto-fill, so hand-set crops are lost (undo brings them back).
 - Under `ulimit -v 3000000`, Node 22 cannot start main.ts: its TypeScript-stripping WebAssembly cannot reserve memory. main.ts was run without the limit; it is small.
 - The state is not saved to localStorage yet.
