@@ -69,6 +69,7 @@ export function bindPreviewPointer(canvas, state, hooks) {
     return { x: ((e.clientX - r.left) * canvas.width) / r.width, y: ((e.clientY - r.top) * canvas.height) / r.height };
   };
   canvas.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return; // right-click belongs to the panel menu
     const pt = toCanvas(e);
     const { index, panel } = hitTestPanel(state, pt.x, pt.y, canvas.width, canvas.height);
     selectPanel(state, index);
