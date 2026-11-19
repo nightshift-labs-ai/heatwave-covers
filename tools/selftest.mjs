@@ -94,6 +94,12 @@ try {
   const layoutOn = await one.getAttribute('#layout-tiles button.on', 'data-layout');
   const gradeOn = await one.getAttribute('#grade-swatches button.on', 'data-grade');
   check(layoutOn === 'stripFive' && gradeOn !== gradeBefore, `keys 5 and G pick stripFive and the next grade (${layoutOn} / ${gradeBefore} -> ${gradeOn})`);
+  // Shortcut popover: "?" opens it, Esc closes it.
+  await one.keyboard.press('?');
+  const popOpen = await one.isVisible('#keys-pop');
+  await one.keyboard.press('Escape');
+  const popClosed = !(await one.isVisible('#keys-pop'));
+  check(popOpen && popClosed, `"?" opens the shortcut list and Esc closes it`);
   // Double-click the title on the preview (Strip Five puts it across the middle), type, Enter.
   const pb = await one.locator('#cover-preview').boundingBox();
   await one.mouse.dblclick(pb.x + pb.width / 2, pb.y + pb.height / 2);

@@ -222,6 +222,13 @@ export async function bootHeatwaveStudio() {
     syncSteps();
     status.textContent = `Saved ${names.join(', ')} (${total} ms).`;
   });
+  // Shortcut help popover: the Keys button in the header or "?"; Esc or a click elsewhere closes it.
+  function showKeys(open) {
+    $('keys-pop').hidden = !open;
+    $('keys-btn').setAttribute('aria-expanded', String(open));
+  }
+  $('keys-btn').addEventListener('click', (e) => { e.stopPropagation(); showKeys($('keys-pop').hidden); });
+  document.addEventListener('click', (e) => { if (!e.target.closest('.keys-help')) showKeys(false); });
   // Undo / redo: buttons under the preview, Ctrl+Z, Ctrl+Y or Ctrl+Shift+Z.
   $('undo-btn').addEventListener('click', () => stepHistory(true));
   $('redo-btn').addEventListener('click', () => stepHistory(false));
@@ -234,7 +241,9 @@ export async function bootHeatwaveStudio() {
       stepHistory(key === 'z' && !e.shiftKey);
       return;
     }
+    if (e.key === 'Escape') { showKeys(false); return; }
     if (e.ctrlKey || e.metaKey || e.altKey || e.target.closest('input, textarea')) return;
+    if (e.key === '?') { showKeys($('keys-pop').hidden); return; }
     if (LAYOUT_ORDER[+key - 1]) { state.layoutId = LAYOUT_ORDER[+key - 1]; onChange('layout'); }
     else if (key === 'g') { state.gradeId = GRADE_ORDER[(GRADE_ORDER.indexOf(state.gradeId) + 1) % GRADE_ORDER.length]; onChange('grade'); }
     else if (key === 'e') $('export-png').click();
