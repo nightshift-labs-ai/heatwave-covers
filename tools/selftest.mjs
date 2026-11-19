@@ -41,6 +41,25 @@ try {
   await page.keyboard.press('Control+y');
   const redone = await gradeNow();
   check(undone === 'sunsetStrip' && redone === 'neonNight', `Undo button and Ctrl+Y step the grade back and forth (${undone} / ${redone})`);
+  // Drop a file onto the preview (it lands in the panel under the pointer), then paste one from the clipboard.
+  const trayBefore = await page.locator('#photo-tray img').count();
+  const dropped = await page.evaluate(async () => {
+    const blob = await (await fetch('samples/pier.jpg')).blob();
+    const dt = new DataTransfer();
+    dt.items.add(new File([blob], 'dropped.jpg', { type: 'image/jpeg' }));
+    const c = document.getElementById('cover-preview'), r = c.getBoundingClientRect();
+    const at = { clientX: r.left + r.width * 0.2, clientY: r.top + r.height * 0.3, bubbles: true, cancelable: true, dataTransfer: dt };
+    c.dispatchEvent(new DragEvent('dragenter', at));
+    c.dispatchEvent(new DragEvent('drop', at));
+    await new Promise((res) => setTimeout(res, 600));
+    const pasted = new DataTransfer();
+    pasted.items.add(new File([blob], 'pasted.jpg', { type: 'image/jpeg' }));
+    document.dispatchEvent(new ClipboardEvent('paste', { clipboardData: pasted, bubbles: true, cancelable: true }));
+    await new Promise((res) => setTimeout(res, 600));
+    return document.getElementById('export-status').textContent;
+  });
+  const trayAfter = await page.locator('#photo-tray img').count();
+  check(trayAfter === trayBefore + 2 && /in the tray/.test(dropped), `drop on a panel + paste add 2 photos (${trayBefore} -> ${trayAfter}; "${dropped}")`);
   for (const size of ['1080x1080', '1080x1350', '1920x1080']) {
     await page.click(`#size-buttons button[data-size="${size}"]`);
     const [dl] = await Promise.all([page.waitForEvent('download'), page.click('#export-png')]);

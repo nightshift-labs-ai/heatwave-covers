@@ -1,7 +1,7 @@
 // HEATWAVE Cover Studio: boots the editor (photo tray, live preview with per-panel crop, layout / grade / ink /
 // caption / size controls, Export PNG) and keeps the 3-step strip lit as you go.
 import { loadPhotoFiles, loadPhotoUrl, autoFillPanels } from './photos.js';
-import { bindPreviewPointer, drawSelectionOverlay, zoomPanel } from './editor/panels.js';
+import { bindPreviewPointer, drawSelectionOverlay, zoomPanel, hitTestPanel } from './editor/panels.js';
 import {
   buildLayoutTiles, syncLayoutTiles, buildGradeSwatches, syncGradeSwatches, bindInkControls, bindCaptionFields,
   buildSizeButtons, syncSizeButtons, renderPhotoTray,
@@ -122,13 +122,42 @@ export async function bootHeatwaveStudio() {
     refresh();
   }
 
-  // Photo input, drop zone (and the whole page), paste.
+  // Photo input, drag-and-drop anywhere on the page, paste from the clipboard.
   $('photo-input').addEventListener('change', async (e) => { await addPhotos(await loadPhotoFiles(e.target.files)); e.target.value = ''; });
   const drop = $('drop-zone');
-  document.addEventListener('dragover', (e) => { e.preventDefault(); drop.classList.add('over'); });
-  document.addEventListener('dragleave', () => drop.classList.remove('over'));
-  document.addEventListener('drop', async (e) => { e.preventDefault(); drop.classList.remove('over'); await addPhotos(await loadPhotoFiles(e.dataTransfer.files)); });
-  document.addEventListener('paste', async (e) => { await addPhotos(await loadPhotoFiles([...e.clipboardData.files])); });
+  // Drop highlight: a depth counter, because dragenter/dragleave also fire for every child element crossed.
+  let dragDepth = 0;
+  const carriesFiles = (e) => [...(e.dataTransfer?.types ?? [])].includes('Files');
+  const setOver = (on) => { drop.classList.toggle('over', on); document.body.classList.toggle('dragging-files', on); };
+  document.addEventListener('dragenter', (e) => { if (!carriesFiles(e)) return; dragDepth++; setOver(true); });
+  document.addEventListener('dragleave', (e) => { if (!carriesFiles(e)) return; dragDepth = Math.max(0, dragDepth - 1); if (!dragDepth) setOver(false); });
+  document.addEventListener('dragover', (e) => { if (carriesFiles(e)) e.preventDefault(); });
+  document.addEventListener('drop', async (e) => {
+    if (!carriesFiles(e)) return;
+    e.preventDefault();
+    dragDepth = 0; setOver(false);
+    const photos = await loadPhotoFiles(e.dataTransfer.files);
+    if (!photos.length) { status.textContent = 'That was not an image. Drop JPG, PNG or WebP photos.'; return; }
+    // Dropped on a panel of the preview: the first photo goes into that panel.
+    const r = canvas.getBoundingClientRect();
+    const target = e.target === canvas ? hitTestPanel(state, (e.clientX - r.left) * (canvas.width / r.width), (e.clientY - r.top) * (canvas.height / r.height), canvas.width, canvas.height).index : -1;
+    await addPhotos(photos);
+    if (target >= 0) {
+      state.panels[target] = { photo: state.photos.length - photos.length, zoom: 1, fx: 0.5, fy: 0.38 };
+      state.selected = target;
+      syncControls(); refresh();
+      status.textContent = `Dropped into panel ${target + 1}. Drag it to reframe.`;
+    }
+  });
+  // Paste: image files or image items (a copied screenshot); text pastes into the caption fields are left alone.
+  document.addEventListener('paste', async (e) => {
+    const items = [...(e.clipboardData?.items ?? [])].filter((it) => it.kind === 'file' && it.type.startsWith('image/'));
+    if (!items.length) return;
+    e.preventDefault();
+    const photos = await loadPhotoFiles(items.map((it) => it.getAsFile()).filter(Boolean));
+    await addPhotos(photos);
+    if (photos.length) status.textContent = `Pasted ${photos.length} photo${photos.length > 1 ? 's' : ''}. ${state.photos.length} in the tray.`;
+  });
   document.querySelector('.btn-samples').addEventListener('click', async () => {
     const fresh = SAMPLE_PHOTOS.filter((n) => !state.photos.some((p) => p.name === n));
     await addPhotos(await Promise.all(fresh.map((n) => loadPhotoUrl(`samples/${n}.jpg`, n))));
