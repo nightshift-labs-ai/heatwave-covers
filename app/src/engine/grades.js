@@ -22,9 +22,15 @@ export const GRADES = {
     stops: [[0, '#06303a'], [0.35, '#11847f'], [0.65, '#f2a07e'], [1, '#ffe6d2']],
     mix: 0.62, contrast: 1.15, lift: 0.06,
   },
+  // Noir Heat: black shadows, blood-red mids, cream highlights; a hard-boiled night with the heat still on.
+  noirHeat: {
+    label: 'Noir Heat',
+    stops: [[0, '#0c0608'], [0.3, '#42101a'], [0.55, '#c0182e'], [0.8, '#f2d6b0'], [1, '#fff7e8']],
+    mix: 0.74, contrast: 1.24, lift: 0.04,
+  },
 };
 
-export const GRADE_ORDER = ['sunsetStrip', 'neonNight', 'goldenHour', 'miamiTeal'];
+export const GRADE_ORDER = ['sunsetStrip', 'neonNight', 'goldenHour', 'miamiTeal', 'noirHeat'];
 
 // Grade the pixels of one panel in place.
 export function applyGradeToPanel(imageData, gradeId) {

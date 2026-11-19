@@ -84,6 +84,22 @@ export const LAYOUTS = {
     square: { hero: [0, 0, 0.58, 0.72], frames: [0.58, 0, 1, 0.72], tilts: [-1.5, 0, 0, 1.6], title: [0, 0.72, 1, 1] },
     tall: { hero: [0, 0, 1, 0.47], frames: [0, 0.47, 1, 0.79], tilts: [-1.4, 0, 0, 1.2], title: [0, 0.79, 1, 1] },
   },
+  // Grid Four: 2x2 with the title as a badge across the centre.
+  gridFour: {
+    label: 'Grid Four',
+    kind: 'grid',
+    land: { panels: gridCells(0, 0, 1, 1, 2, 2), title: [0.2, 0.33, 0.8, 0.67], overlay: true },
+    square: { panels: gridCells(0, 0, 1, 1, 2, 2), title: [0.08, 0.35, 0.92, 0.65], overlay: true },
+    tall: { panels: gridCells(0, 0, 1, 1, 2, 2), title: [0.05, 0.38, 0.95, 0.62], overlay: true },
+  },
+  // Full Bleed + Inset: one photo fills the cover, two framed insets on the right, big title bottom-left.
+  fullBleedInset: {
+    label: 'Full Bleed',
+    kind: 'inset',
+    land: { hero: [0, 0, 1, 1], insets: [[0.68, 0.06, 0.96, 0.42, 2], [0.68, 0.46, 0.96, 0.82, -1.6]], title: [0.02, 0.58, 0.64, 0.98] },
+    square: { hero: [0, 0, 1, 1], insets: [[0.6, 0.05, 0.95, 0.31, 2], [0.6, 0.34, 0.95, 0.6, -1.6]], title: [0.03, 0.64, 0.97, 0.98] },
+    tall: { hero: [0, 0, 1, 1], insets: [[0.55, 0.04, 0.95, 0.24, 2], [0.55, 0.27, 0.95, 0.47, -1.6]], title: [0.03, 0.68, 0.97, 0.98] },
+  },
   stripFive: {
     label: 'Strip Five',
     kind: 'grid',
@@ -93,7 +109,7 @@ export const LAYOUTS = {
   },
 };
 
-export const LAYOUT_ORDER = ['keyArtNine', 'heroAndSix', 'heroFour', 'tiltedSnapshots', 'stripFive'];
+export const LAYOUT_ORDER = ['keyArtNine', 'heroAndSix', 'heroFour', 'tiltedSnapshots', 'stripFive', 'gridFour', 'fullBleedInset'];
 
 export const COVER_SIZES = [
   { w: 1080, h: 1080, label: '1080 × 1080', sub: 'square' },
@@ -127,6 +143,12 @@ export function layoutFor(layoutId, W, H) {
       return { x: Math.round(x + pad / 2), y: Math.round(y + pad / 2), w: Math.round(cw - pad), h: Math.round(ch - pad), rot: (deg * Math.PI) / 180, snap: true, frame: true, border };
     });
     return { kind: 'grid', framed: area, panels: [hero, ...frames], title: rectToPixels(spec.title, W, H, g, g / 2), gutter: g, overlay: false };
+  }
+  if (layout.kind === 'inset') {
+    const hero = { ...rectToPixels(spec.hero, W, H, g, 0), rot: 0, snap: false };
+    const border = Math.max(3, Math.round(Math.min(W, H) * 0.009));
+    const insets = spec.insets.map(([x0, y0, x1, y1, deg]) => ({ ...rectToPixels([x0, y0, x1, y1], W, H, 0, 0), rot: (deg * Math.PI) / 180, snap: true, frame: true, border }));
+    return { kind: 'grid', panels: [hero, ...insets], title: rectToPixels(spec.title, W, H, 0, 0), gutter: g, overlay: true };
   }
   const panels = spec.panels.map((r) => ({ ...rectToPixels(r, W, H, g, g / 2), rot: 0, snap: false }));
   return { kind: 'grid', panels, title: rectToPixels(spec.title, W, H, g, g / 2), gutter: g, overlay: !!spec.overlay };
