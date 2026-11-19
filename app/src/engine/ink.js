@@ -137,12 +137,20 @@ export function meanLuminance(imageData) {
   return sum / (d.length / 16) / 255;
 }
 
+// Posterize the luminance into flat bands and scale RGB to match, so hues stay true (no olive skin or green hair).
 function posterize(imageData, levels, s) {
   const d = imageData.data;
   const step = 255 / (levels - 1);
-  const lut = new Uint8ClampedArray(256);
-  for (let v = 0; v < 256; v++) lut[v] = v * (1 - s) + Math.round(v / step) * step * s;
-  for (let i = 0; i < d.length; i += 4) { d[i] = lut[d[i]]; d[i + 1] = lut[d[i + 1]]; d[i + 2] = lut[d[i + 2]]; }
+  const gain = new Float32Array(256);
+  for (let v = 1; v < 256; v++) {
+    const q = Math.max(step * 0.35, Math.round(v / step) * step);
+    gain[v] = 1 + (q / v - 1) * s;
+  }
+  gain[0] = 1;
+  for (let i = 0; i < d.length; i += 4) {
+    const g = gain[Math.min(255, lum(d, i) | 0)];
+    d[i] *= g; d[i + 1] *= g; d[i + 2] *= g;
+  }
 }
 
 function lum(d, i) {
