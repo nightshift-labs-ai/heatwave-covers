@@ -28,7 +28,7 @@ const SCENES = {
   // Shot 3: 1080 x 1350, Key Art Slash in Neon Night: the couple on the pier as the hero, the fisher and the neon man
   // as the two faces in the middle row, the marina skyline, the neon pool and the rainy motel along the bottom.
   'cover-tall': {
-    layoutId: 'keyArtSlash', gradeId: 'neonNight', size: [1080, 1350],
+    layoutId: 'keyArtSlash', gradeId: 'neonNight', size: [1080, 1350], ink: 0, // M10: Poster Ink off, clean photos like shot 1
     caption: {
       title: 'SALT & SIRENS', subtitle: 'Harbor Run', tagline: 'ONE NIGHT ON THE WATERFRONT',
       quote: '"LOUD, SALTY AND GORGEOUS" — BAYSIDE BEAT', tags: ['THE SWEETHEARTS', 'DOCK NINE · 2 AM', 'THE NIGHT MANAGER'],
@@ -42,7 +42,7 @@ const SCENES = {
   // Shot 4: 1080 x 1080 from ONE photo: Key Art Slash's hero and four slanted panels, each its own crop of the same
   // face photo (full figure, face close-up, hands, the sign behind), in warm Golden Hour.
   'cover-one': {
-    layoutId: 'keyArtSlash', gradeId: 'goldenHour', size: [1080, 1080],
+    layoutId: 'keyArtSlash', gradeId: 'goldenHour', size: [1080, 1080], ink: 0, // M10: Poster Ink off, clean photos like shot 1
     caption: {
       title: 'MOTEL MIRAGE', subtitle: 'One Photo, Five Shots', tagline: 'FIVE CROPS · ONE SNAPSHOT',
       quote: '"ONE FACE, FIVE ALIBIS" — THE DUNE DISPATCH', tags: ['THE GUEST', 'ROOM 12 · CHECK-OUT NOON', 'THE REGULAR'],
