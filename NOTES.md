@@ -1,5 +1,46 @@
 # NOTES (HEATWAVE Cover Studio)
 
+## Status: M10 done (run 11, 21 Nov 2026, 10:05-10:15 EET): one clean, consistent studio across the four shots
+An independent 12-call panel (both orders) put M9 ahead of the dev #1 and #2 covers but behind #3. It named two gaps.
+(a) Shots 3 and 4 used heavy Poster Ink, so their photos looked blotchy and washed out next to shot 1, and in each a
+seal or tag sat on or against a face. (b) The shot 1 panels did not share one grade: THE ALIBI read cool blue, and
+THE NEWLYWEDS and THE OLD SALT read pale beside the warm sunset hero.
+
+### What changed
+- Step 1, shots 3 and 4: Poster Ink is off (`ink: 0`) in the cover-tall (SALT & SIRENS) and cover-one (MOTEL
+  MIRAGE) scenes, so both now have a clean photographic grade like shot 1. Layouts, photos, titles, grades and sizes
+  are unchanged. Only two positions moved: keyArtSlash tall's THE NIGHT MANAGER tag went from just above the pool
+  woman's head onto the motel panel's dark sky ([5, 0.675, 0.815]), and keyArtSlash square's HOT seal went from
+  against the lower-left face onto the hero's open balcony wall ([0.8, 0.27]). Shot 2 uses the wide keyArtSlash
+  anchors and is unchanged.
+- Step 2, shot 1: new optional per-panel `warm` value (0..0.3; the code had no per-panel grade before). It raises that
+  panel's gradient-map mix for the current grade and trims its shadow lift. Panels that do not set it render exactly
+  as before, and it is part of the art cache key. The Key Art Cast scene sets NEWLYWEDS 0.2, ALIBI 0.25 and
+  OLD SALT 0.2. The neon marina night under the title is still the single cool accent. No photos were added.
+
+### A/B (before = out/ab/m10_before_<n>.jpg, after = out/ab/m10_after_<n>.jpg)
+- Shots 3 and 4 at 1024 px long side: kept. Without ink, skin, sky and water are smooth, with no halftone blotches,
+  and they read like the same studio as shot 1. The moved tag and seal are clear of faces, the title, the pill and
+  the other tags, so no tag sits on a tag or a seal.
+- Shot 1 at 1024x576: kept. THE ALIBI changes from blue to the hero's magenta and sunset tones, and NEWLYWEDS and
+  OLD SALT are richer and warmer, so the cover reads as one sunset image. Every face and all 8 role tags still read,
+  and the quote line and seal are unchanged from M9.
+
+### Checks
+- Judge-sheet preview: GATE OK. Shots: 219.2 / 159.6 / 166.7 / 165.4 KiB (1280x720, 1280x800, 864x1080, 960x960),
+  all within budget.
+- Dossier: 1,110,747 B, byte-identical on two runs. main.ts would not start under the memory ulimit, so it ran
+  without it, as in M4.
+- Name grep: clean. Selftest: 22/22. Kit check: run after the commit (see the final report).
+
+### Known issues / next
+- The editor still defaults to Poster Ink on (0.8); only the shot scenes turned it off. Consider defaulting new
+  sessions to off or a light setting.
+- The `warm` value is scene-only; the editor has no control for it yet. A per-panel "match grade" slider would make
+  it a user feature.
+- Shot 3's right column now holds two tags (DOCK NINE, NIGHT MANAGER) one above the other, with about 20 px between
+  them. They are readable but a little busy.
+
 ## Status: M9 done (run 10, 21 Nov 2026, 09:40-09:50 EET): no layout collisions on shot 1
 An independent panel kept M8's cast grid but kept naming one flaw on shot 1: the seal sat on THE NIGHT OWL tag and
 hid OWL, and the review-quote line ran straight into that tag, so the two read as one crowded strip. M9 changes only
