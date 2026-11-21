@@ -1,5 +1,45 @@
 # NOTES (HEATWAVE Cover Studio)
 
+## Status: M8 done (run 9, 21 Nov 2026, 09:02-09:12 EET): people-first cast cover on shot 1
+The six covers ranked above ours on the dev board are all cast covers (7-9 portrait panels, each with a short role
+tag, around one big title). M8 turns shot 1 into a cast cover and keeps everything M7 had.
+
+### What changed
+- New layout Key Art Cast (`keyArtCast` in app/src/engine/layouts.js; shot 1 only, not in the picker). The rooftop
+  hero stays on the left and is still the biggest image. Beside her is a 3 + 3 grid of portraits: woman-palms,
+  man-neon, couple-pier, then neon-closeup, lady-motel, pier-fisher. Under the title, the neon marina night stays as
+  the cool accent, and the rider (moto-causeway) sits bottom-right. That makes 8 people panels, 9 distinct photos
+  and no vehicle or scenery panel apart from the night accent. The seal moved to the junction of the mid row and the
+  bottom-right panel.
+- Role tags (our own wording, in our existing tag style, at each panel's lower-left or upper-left, off the faces):
+  THE CLOSER, THE TIPSTER, THE BROKER, THE NEWLYWEDS, THE ALIBI, THE NIGHT OWL, THE OLD SALT, THE FIXER. They are
+  set in the shot scene's caption.tags. The editor still keeps 3 tags.
+- No photos added (duo-causeway and hero-duo were not needed). main.ts header line for shot 1 updated.
+- Kept as before: the HEATWAVE title, the Coastline Nights script, the quote, the band and the billing line, ink 0
+  (crisp), Sky glow, and warm and cool scenes side by side. Shots 2-4 untouched.
+
+### A/B at 1024x576 (out/ab/before_1024.jpg = M7, out/ab/m8b_1024.jpg = M8): kept
+At the judge's size M8 reads at once as a cast cover: 8 faces, each with a readable tag, and the hero still dominant.
+Every portrait face is readable. Nothing regressed: the title, script and dressing are unchanged, and the
+neon/purple panels (man-neon, neon-closeup, the marina) still sit against the sunset ones. The first try hid THE
+ALIBI and clipped THE NIGHT OWL under the quote line. Fix: THE ALIBI moved to the top-left of its panel and the
+close-up was re-cropped (zoom 1.3) so the face moved right, away from the tag. THE NIGHT OWL moved up, right of the
+quote's end.
+
+### Checks (this run)
+GATE OK. Shots: 217.2 KiB 1280x720 / 159.1 KiB 1280x800 / 163.5 KiB 864x1080 / 168.5 KiB 960x960. Dossier is
+1,106,251 B and byte-identical across two runs. Name grep clean. selftest 22/22. Kit check after the final commit.
+
+### Known issues
+- The quote's sparkle slightly nicks the THE NIGHT OWL tag. The tag still reads.
+- The outer frame is still the light cream border. There was no time to make it dark or edge to edge.
+- The rider's face is small. He reads as a figure, not a portrait.
+
+### Next
+- Dark or edge-to-edge outer frame on shot 1 (keyart border colour per layout).
+- Give the rider panel a true portrait (e.g. hero-duo or duo-causeway) and move the night accent's tag-free space
+  so the seal sits fully on scenery.
+
 ## Status: M7 done (run 8, 19 Nov 2026, 21:03-21:13 EET): one more story beat on shot 1, contrast kept
 Short run on shot 1 at the dev judge's size (1024x576; the judge sees only shot 1). Everything M5 has is kept: the
 rooftop hero, the HEATWAVE title and script, all dressing, the crisp no-ink look, Sky glow, and the neon marina night
@@ -387,7 +427,7 @@ Shot 1 keeps M1's Poster Ink key-art look and layout (operator decision SHOT1_ST
 Current set (M7; shots 2-4 from M3b):
 | shot | content | file |
 |---|---|---|
-| 1-cover-1920.jpg | exported 1920x1080: Key Art Slash Plus, Sunset Strip, no Poster Ink (crisp grade, deep shadows), Sky glow on, rooftop hero in aviators looking out of frame, speedboat by the towers (top-middle), neon marina, neon close-up, moto, 7 distinct photos (M7) | 1280x720, 221.4 KiB |
+| 1-cover-1920.jpg | exported 1920x1080: Key Art Cast, Sunset Strip, no Poster Ink (crisp grade, deep shadows), Sky glow on, rooftop hero in aviators (biggest), 3 + 3 portrait grid and the rider, 8 people each with a role tag, neon marina night accent under the title, 9 distinct photos (M8) | 1280x720, 217.2 KiB |
 | 2-editor.jpg | editor 1280x800: Key Art Slash (NIGHT DRIVE), hero selected, 8 layout tiles, grade chips, Poster extras toggles + quote/tag fields, Undo live | 159.1 KiB |
 | 3-cover-1080x1350.jpg | exported 1080x1350: Key Art Slash, Neon Night, SALT & SIRENS, 6 photos | 864x1080, 163.5 KiB |
 | 4-cover-1080.jpg | exported 1080x1080: Key Art Slash from ONE photo (lady-motel) in 5 crops, Golden Hour, MOTEL MIRAGE | 960x960, 168.5 KiB |
