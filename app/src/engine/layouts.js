@@ -171,7 +171,34 @@ LAYOUTS.keyArtSlashPlus = {
   },
 };
 
-export const LAYOUT_ORDER = ['keyArtSlash', 'keyArtNine','heroAndSix', 'heroFour', 'tiltedSnapshots', 'stripFive', 'gridFour', 'fullBleedInset'];
+// Key Art Cast (shot 1 only; not in the picker, M8): a people-first cast cover. The hero (still the biggest image)
+// on the left, a 3 + 3 grid of portrait panels on the right, a cool night accent under the title and one more
+// person bottom-right; each person panel carries a short role tag at its lower-left, clear of the faces.
+LAYOUTS.keyArtCast = {
+  ...LAYOUTS.keyArtSlash,
+  label: 'Key Art Cast',
+  land: {
+    ...LAYOUTS.keyArtSlash.land,
+    polys: [
+      [[0, 0], [0.47, 0], [0.452, 1], [0, 1]],
+      [[0.47, 0], [0.648, 0], [0.645, 0.3], [0.465, 0.29]],
+      [[0.648, 0], [0.824, 0], [0.822, 0.305], [0.645, 0.3]],
+      [[0.824, 0], [1, 0], [1, 0.31], [0.822, 0.305]],
+      [[0.465, 0.29], [0.645, 0.3], [0.642, 0.57], [0.46, 0.56]],
+      [[0.645, 0.3], [0.822, 0.305], [0.82, 0.575], [0.642, 0.57]],
+      [[0.822, 0.305], [1, 0.31], [1, 0.58], [0.82, 0.575]],
+      [[0.46, 0.56], [0.775, 0.577], [0.79, 1], [0.452, 1]],
+      [[0.775, 0.577], [1, 0.58], [1, 1], [0.79, 1]],
+    ],
+    seal: [0.79, 0.577],
+    tags: [
+      [0, 0.04, 0.16, -3], [1, 0.48, 0.235, 2], [2, 0.66, 0.245, -2], [3, 0.835, 0.25, 2],
+      [4, 0.47, 0.33, -2], [5, 0.69, 0.47, 2], [6, 0.835, 0.52, -2], [8, 0.81, 0.93, 2],
+    ],
+  },
+};
+
+export const LAYOUT_ORDER =['keyArtSlash', 'keyArtNine','heroAndSix', 'heroFour', 'tiltedSnapshots', 'stripFive', 'gridFour', 'fullBleedInset'];
 
 export const COVER_SIZES = [
   { w: 1080, h: 1080, label: '1080 × 1080', sub: 'square' },

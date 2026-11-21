@@ -11,15 +11,18 @@ const SCENES = {
   // the title, the motorbike cropped so the rider sits right of the third tag and above the band, and (Key Art Slash
   // Plus, M7) the daytime speedboat on blue water in the new top-middle panel between the hero and the marina.
   'cover-keyart': {
-    layoutId: 'keyArtSlashPlus', gradeId: 'sunsetStrip', size: [1920, 1080], ink: 0,
-    caption: { title: 'HEATWAVE', subtitle: 'Coastline Nights', tagline: 'ONE COASTLINE · SIX STORIES · NO CURFEW' },
-    photos: ['hero-rooftop', 'marina-night', 'coupe-desert', 'neon-closeup', 'marina-skyline', 'moto-causeway', 'speedboat'],
+    layoutId: 'keyArtCast', gradeId: 'sunsetStrip', size: [1920, 1080], ink: 0,
+    caption: {
+      title: 'HEATWAVE', subtitle: 'Coastline Nights', tagline: 'ONE COASTLINE · SIX STORIES · NO CURFEW',
+      tags: ['THE CLOSER', 'THE TIPSTER', 'THE BROKER', 'THE NEWLYWEDS', 'THE ALIBI', 'THE NIGHT OWL', 'THE OLD SALT', 'THE FIXER'],
+    },
+    photos: ['hero-rooftop', 'woman-palms', 'man-neon', 'couple-pier', 'neon-closeup', 'lady-motel', 'pier-fisher', 'marina-night', 'moto-causeway'],
     panels: [
       { photo: 0, zoom: 1, fx: 0.4, fy: 0.3 },
-      { photo: 1, zoom: 1, fx: 0.5, fy: 0.5 },
-      { photo: 2, zoom: 1.1, fx: 0.5, fy: 0.36 }, { photo: 3, zoom: 1.05, fx: 0.57, fy: 0.4 },
-      { photo: 4, zoom: 1.1, fx: 0.5, fy: 0.45 }, { photo: 5, zoom: 1.25, fx: 0.55, fy: 0.5 },
-      { photo: 6, zoom: 1.2, fx: 0.5, fy: 0.55 },
+      { photo: 1, zoom: 1.1, fx: 0.5, fy: 0.3 }, { photo: 2, zoom: 1.1, fx: 0.5, fy: 0.3 },
+      { photo: 3, zoom: 1.1, fx: 0.5, fy: 0.35 }, { photo: 4, zoom: 1.3, fx: 0.42, fy: 0.42 },
+      { photo: 5, zoom: 1.1, fx: 0.5, fy: 0.3 }, { photo: 6, zoom: 1.1, fx: 0.5, fy: 0.3 },
+      { photo: 7, zoom: 1, fx: 0.5, fy: 0.5 }, { photo: 8, zoom: 1.6, fx: 0.55, fy: 0.45 },
     ],
   },
   // Shot 3: 1080 x 1350, Key Art Slash in Neon Night: the couple on the pier as the hero, the fisher and the neon man
