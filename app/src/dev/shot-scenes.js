@@ -20,8 +20,9 @@ const SCENES = {
     panels: [
       { photo: 0, zoom: 1, fx: 0.4, fy: 0.3 },
       { photo: 1, zoom: 1.1, fx: 0.5, fy: 0.3 }, { photo: 2, zoom: 1.1, fx: 0.5, fy: 0.3 },
-      { photo: 3, zoom: 1.1, fx: 0.5, fy: 0.35 }, { photo: 4, zoom: 1.3, fx: 0.42, fy: 0.42 },
-      { photo: 5, zoom: 1.1, fx: 0.5, fy: 0.3 }, { photo: 6, zoom: 1.1, fx: 0.5, fy: 0.3 },
+      // M10: warm pushes THE NEWLYWEDS (pale), THE ALIBI (cool blue) and THE OLD SALT (pale) toward the hero's sunset.
+      { photo: 3, zoom: 1.1, fx: 0.5, fy: 0.35, warm: 0.2 }, { photo: 4, zoom: 1.3, fx: 0.42, fy: 0.42, warm: 0.25 },
+      { photo: 5, zoom: 1.1, fx: 0.5, fy: 0.3 }, { photo: 6, zoom: 1.1, fx: 0.5, fy: 0.3, warm: 0.2 },
       { photo: 7, zoom: 1, fx: 0.5, fy: 0.5 }, { photo: 8, zoom: 1.6, fx: 0.55, fy: 0.45 },
     ],
   },

@@ -134,7 +134,8 @@ const artCache = new Map();
 function panelArt(photo, slot, pw, ph, state, W, i, fast) {
   const ink = state.ink.on && !fast;
   const glow = state.skyGlow !== false && hasSkyPalette(state.gradeId);
-  const key = `${photo.id}|${slot.zoom.toFixed(3)}|${slot.fx.toFixed(3)}|${slot.fy.toFixed(3)}|${pw}x${ph}|${state.gradeId}|${ink ? state.ink.strength : 0}|${W}|${glow ? 'g' : ''}`;
+  const warm = slot.warm ?? 0; // per-panel warm push (M10), 0 for every panel that does not set it
+  const key = `${photo.id}|${slot.zoom.toFixed(3)}|${slot.fx.toFixed(3)}|${slot.fy.toFixed(3)}|${pw}x${ph}|${state.gradeId}|${ink ? state.ink.strength : 0}|${W}|${glow ? 'g' : ''}|${warm}`;
   const hit = artCache.get(key);
   if (hit) { artCache.delete(key); artCache.set(key, hit); return hit; }
   const c = document.createElement('canvas');
@@ -146,10 +147,10 @@ function panelArt(photo, slot, pw, ph, state, W, i, fast) {
   const sky = glow ? skyMaskBeforeGrade(data, skin) : null;
   const lumHalf = ink ? smoothForInk(data, W) : null;
   autoLevelsBeforeGrade(data);
-  applyGradeToPanel(data, state.gradeId, { keepHighlights: ink ? 0.7 : 0 });
+  applyGradeToPanel(data, state.gradeId, { keepHighlights: ink ? 0.7 : 0, warm });
   if (sky) paintSkyGlow(data, sky, state.gradeId);
   if (ink) posterInk(data, lumHalf, { coverW: W, strength: state.ink.strength, paper: gradeColorAt(state.gradeId, 0.5), seed: 17 + i * 101, skin });
-  else liftKeepShadows(data, 0.44);
+  else liftKeepShadows(data, 0.44 * (1 - Math.min(1, warm * 2)));
   grainAndVignette(data, 911 + i * 37);
   cctx.putImageData(data, 0, 0);
   if (!fast) {
