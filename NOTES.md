@@ -1,5 +1,34 @@
 # NOTES (HEATWAVE Cover Studio)
 
+## Status: M9 done (run 10, 21 Nov 2026, 09:40-09:50 EET): no layout collisions on shot 1
+An independent panel kept M8's cast grid but kept naming one flaw on shot 1: the seal sat on THE NIGHT OWL tag and
+hid OWL, and the review-quote line ran straight into that tag, so the two read as one crowded strip. M9 changes only
+the positions of the seal and one tag.
+
+### What changed
+- Seal (Key Art Cast only): moved from the panel junction [0.79, 0.577] onto the open sunset sky of the rider panel
+  [0.865, 0.665]. There it touches no tag, face or title letter. It sits below THE OLD SALT, left of the palms and
+  above the rider.
+- THE NIGHT OWL tag: moved from the panel's lower-left [0.69, 0.47] to [0.655, 0.4], just under the woman's chin
+  (clear of her face). It no longer shares a row with the quote, so the quote line now ends in open art with clear
+  space after it.
+- Not changed: photos, grid, title, script, quote text and size, grade, frame. The quote and seal drawing code
+  (dressing.js) is untouched, so shots 2-4 can't change (they don't use Key Art Cast).
+
+### A/B at 1024x576 (out/ab/before_1024.jpg = M8, out/ab/m9_1024.jpg = M9; crops before_crop / m9_crop): kept
+All 8 role tags can be read in full. The HOT seal is a clean badge on open sky instead of a patch over a tag. The
+quote line stands alone above the title. Nothing else moved. The full-size crop confirms the tag sits under the chin
+and doesn't touch the face.
+
+### Checks
+- Judge-sheet preview: GATE OK. Shots 219.6 / 159.6 / 163.5 / 168.0 KiB, all within the gate sizes.
+- Dossier: 1,109,753 B, byte-identical on two runs (<= 1.3 MiB). Name grep over app/: clean.
+- Selftest: 22/22. Kit check: 4 passed, 0 failed (17 skipped, 5 checked at submission).
+
+### Known issues / next
+- The area where the title meets the lower panels was not changed in M9 (the run allowed only seal, tag and quote
+  moves). Next: an A/B that gives the title's right end a little more air, judged at 1024x576.
+
 ## Status: M8 done (run 9, 21 Nov 2026, 09:02-09:12 EET): people-first cast cover on shot 1
 The six covers ranked above ours on the dev board are all cast covers (7-9 portrait panels, each with a short role
 tag, around one big title). M8 turns shot 1 into a cast cover and keeps everything M7 had.
@@ -427,7 +456,7 @@ Shot 1 keeps M1's Poster Ink key-art look and layout (operator decision SHOT1_ST
 Current set (M7; shots 2-4 from M3b):
 | shot | content | file |
 |---|---|---|
-| 1-cover-1920.jpg | exported 1920x1080: Key Art Cast, Sunset Strip, no Poster Ink (crisp grade, deep shadows), Sky glow on, rooftop hero in aviators (biggest), 3 + 3 portrait grid and the rider, 8 people each with a role tag, neon marina night accent under the title, 9 distinct photos (M8) | 1280x720, 217.2 KiB |
+| 1-cover-1920.jpg | exported 1920x1080: Key Art Cast, Sunset Strip, no Poster Ink (crisp grade, deep shadows), Sky glow on, rooftop hero in aviators (biggest), 3 + 3 portrait grid and the rider, 8 people each with a role tag, neon marina night accent under the title, 9 distinct photos (M8), seal on the rider panel's open sky and NIGHT OWL tag clear of the quote (M9) | 1280x720, 219.6 KiB |
 | 2-editor.jpg | editor 1280x800: Key Art Slash (NIGHT DRIVE), hero selected, 8 layout tiles, grade chips, Poster extras toggles + quote/tag fields, Undo live | 159.1 KiB |
 | 3-cover-1080x1350.jpg | exported 1080x1350: Key Art Slash, Neon Night, SALT & SIRENS, 6 photos | 864x1080, 163.5 KiB |
 | 4-cover-1080.jpg | exported 1080x1080: Key Art Slash from ONE photo (lady-motel) in 5 crops, Golden Hour, MOTEL MIRAGE | 960x960, 168.5 KiB |
